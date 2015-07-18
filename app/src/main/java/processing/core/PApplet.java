@@ -1689,7 +1689,7 @@ public class PApplet extends CardboardActivity
         finished = true;
     }
 
-    public void headtransform(HeadTransform headTransform) {}
+    public void headTransform(HeadTransform headTransform) {}
 
     //////////////////////////////////////////////////////////////
 
@@ -2227,7 +2227,7 @@ public class PApplet extends CardboardActivity
     }
 
     public void handleHeadTransform(HeadTransform headTransform) {
-        headtransform(headTransform);
+        headTransform(headTransform);
     }
 
 //    public void handleDraw() {
@@ -2433,9 +2433,9 @@ public class PApplet extends CardboardActivity
                 draw();
             }
             else {
+                draw();
                 pushMatrix();
                 translate(0, 0);
-                //stereo.left();
                 drawLeft();
                 popMatrix();
             }
@@ -2449,7 +2449,6 @@ public class PApplet extends CardboardActivity
         else if (!monocular) {
             pushMatrix();
             translate(displayWidth / 2, 0);
-            //stereo.right();
             drawRight();
             popMatrix();
         }

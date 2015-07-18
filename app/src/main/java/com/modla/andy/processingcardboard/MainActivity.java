@@ -155,10 +155,7 @@ public class MainActivity extends PApplet {
     public void onCardboardTrigger() {
         // user feedback
         vibrator.vibrate(50);
-        cameraPositionX = STARTX;
-        cameraPositionY = STARTY;
-        cameraPositionZ = STARTZ;
-        cardboardView.resetHeadTracker();
+        resetTracker();
     }
 
     /**
@@ -229,6 +226,8 @@ public class MainActivity extends PApplet {
     PShape texCubeRight;
     PShape backgroundFrameLeft;
     PShape backgroundFrameRight;
+    PShape textS;
+    PShape textG;
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
@@ -276,6 +275,7 @@ public class MainActivity extends PApplet {
             //backgroundRight = loadImage("data/IMG_0338_r.JPG");
             backgroundLeft = loadImage("data/IMG_0526_l.JPG");
             backgroundRight = loadImage("data/IMG_0526_r.JPG");
+            textS = loadShape("data/text.svg");
         }
         texCube = createCube(photo);
         texCubeRight = createCube(photoRight);
@@ -297,7 +297,7 @@ public class MainActivity extends PApplet {
                 0f, 0f, -1f,  // directionX, directionY, directionZ
                 0f, 1f, 0f);  // upX, upY, upZ
         cardboardView.resetHeadTracker();
-
+        //textMode(SHAPE);  // TODO not supported in Processing-Android
     }
 
     @Override
@@ -378,7 +378,8 @@ public class MainActivity extends PApplet {
     PShape createFrame(PImage photo) {
         PShape face = createShape();
         face.beginShape(QUAD);
-        face.noStroke();
+        //face.noStroke();
+        face.stroke(0);
         face.textureMode(NORMAL);
         face.texture(photo);
         face.vertex(-1, -1, 0, 0, 0);
@@ -389,10 +390,15 @@ public class MainActivity extends PApplet {
         return face;
     }
 
-    PShape createText(String text) {
+    PShape createText(String t) {
         PImage texture = createImage(100, 20, RGB);
+        text(t, 0, 0);
+        //loadPixels();  // TODO not implemented in Processing-Android
         texture.loadPixels();
-        // TODO
+        for (int i=0; i<pixels.length; i++) {
+            texture.pixels[i] = pixels[i];
+        }
+        texture.updatePixels();
         PShape face = createShape();
         face.beginShape(QUAD);
         face.noStroke();
@@ -418,13 +424,14 @@ public class MainActivity extends PApplet {
         // move frame back so cube does not get clipped by background image
         translate(0, 0, -.5f);
         shape(frame);
-
         popMatrix();
     }
 
-    void drawText(String s) {
+    void drawText(PShape s) {
         pushMatrix();
-        text(s, 0, 0, 0);
+        scale(.02f);
+        translate(-100, 100, 140);
+        shape(s);
         popMatrix();
     }
 
@@ -434,16 +441,23 @@ public class MainActivity extends PApplet {
         roty += (mouseX - pmouseX) * rate;
     }
 
+    void resetTracker() {
+        cameraPositionX = STARTX;
+        cameraPositionY = STARTY;
+        cameraPositionZ = STARTZ;
+        cardboardView.resetHeadTracker();
+    }
+
     @Override
-    public void headtransform(HeadTransform headTransform) {
+    public void headTransform(HeadTransform headTransform) {
         float[] quat = new float[4];
         headTransform.getQuaternion(quat, 0);
         // normalize quaternion
         float length = (float) Math.sqrt(quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3]);
         int DIV = 10;
-        float lowSpeed = .01f;
-        float mediumSpeed = .02f;
-        float highSpeed = .04f;
+        float lowSpeed = .005f;
+        float mediumSpeed = .01f;
+        float highSpeed = .02f;
         float pitchSpeed = 0;
         float yawSpeed = 0;
         float rollSpeed = 0;
@@ -536,14 +550,10 @@ public class MainActivity extends PApplet {
      */
     @Override
     public void drawLeft() {
-        stereo.start(
-                cameraPositionX, cameraPositionY, cameraPositionZ,
-                0f, 0f, -1f,  // directionX, directionY, directionZ
-                0f, 1f, 0f);  // upX, upY, upZ
-        background(0);
         stereo.left();
         drawFrame(backgroundFrameLeft);
         drawPhotoCube(texCube);
+        drawText(textS);
     }
 
     /**
@@ -554,22 +564,20 @@ public class MainActivity extends PApplet {
         stereo.right();
         drawFrame(backgroundFrameRight);
         drawPhotoCube(texCubeRight);
-
+        drawText(textS);
     }
 
     /**
-     * Processing draw function. Called when VRMode disabled.
+     * Processing draw function. Called before drawLeft and drawRight.
      */
     @Override
     public void draw() {
         //println("draw()");
-        stroke(128);
-        line(0, 0, displayWidth, displayHeight);
-        stroke(255);
-        if (mousePressed) {
-            println("mousePressed");
-            line(mouseX, mouseY, pmouseX, pmouseY);
-        }
+        stereo.start(
+                cameraPositionX, cameraPositionY, cameraPositionZ,
+                0f, 0f, -1f,  // directionX, directionY, directionZ
+                0f, 1f, 0f);  // upX, upY, upZ
+        background(0);
     }
 
     int KEYCODE_MEDIA_NEXT = 87; // RIGHT
@@ -590,7 +598,10 @@ public class MainActivity extends PApplet {
             roty += PI / 4;
         } else if (keyCode == DOWN || keyCode == KEYCODE_MEDIA_REWIND) {
             roty -= PI / 4;
+        } else if (keyCode == KEYCODE_ENTER) {
+            resetTracker();
         }
+
     }
 
 }
