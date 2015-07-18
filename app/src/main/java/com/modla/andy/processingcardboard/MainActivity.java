@@ -1,5 +1,5 @@
 /*
-  Example Processing sketch using stereo Google Android Cardboard SDK
+  Example Processing VR sketch using Google Android Cardboard SDK
 
   Copyright (c) 2015 Andy Modla
 
@@ -272,8 +272,10 @@ public class MainActivity extends PApplet {
             photoRight[3] = loadImage("data/IMG_0516_r.JPG");
             photoRight[4] = loadImage("data/IMG_0519_r.JPG");
             photoRight[5] = loadImage("data/IMG_0524_r.JPG");
-            backgroundLeft = loadImage("data/IMG_0338_l.JPG");
-            backgroundRight = loadImage("data/IMG_0338_r.JPG");
+            //backgroundLeft = loadImage("data/IMG_0338_l.JPG");
+            //backgroundRight = loadImage("data/IMG_0338_r.JPG");
+            backgroundLeft = loadImage("data/IMG_0526_l.JPG");
+            backgroundRight = loadImage("data/IMG_0526_r.JPG");
         }
         texCube = createCube(photo);
         texCubeRight = createCube(photoRight);
@@ -408,7 +410,7 @@ public class MainActivity extends PApplet {
      * Draw photo in frame defined as a PShape. We use PShape
      * to display a photo in P3D/OPENGL Processing mode.
      *
-     * @param frame
+     * @param frame Photo to display.
      */
     void drawFrame(PShape frame) {
         pushMatrix();
