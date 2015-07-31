@@ -737,7 +737,7 @@ public class PGraphics extends PImage implements PConstants {
    * image data, for instance a BufferedImage with tint() settings applied for
    * PGraphicsJava2D, or resized image data and OpenGL texture indices for
    * PGraphicsOpenGL.
-   * @param renderer The PGraphics renderer associated to the image
+   * @param image The PGraphics renderer associated to the image
    * @param storage The metadata required by the renderer
    */
   public void setCache(PImage image, Object storage) {

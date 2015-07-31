@@ -25,17 +25,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="268.6073"
-     inkscape:cy="866.11667"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="338.8826"
+     inkscape:cy="988.92736"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="false"
+     showgrid="true"
      inkscape:window-width="1536"
      inkscape:window-height="803"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     showguides="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3352" />
+  </sodipodi:namedview>
   <metadata
      id="metadata3364">
     <rdf:RDF>
@@ -44,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -55,7 +60,7 @@
     <g
        style="font-style:normal;font-weight:normal;font-size:80px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="flowRoot3375"
-       transform="matrix(0.33532575,0,0,0.49302368,-4.5801513,-11.933524)">
+       transform="matrix(0.33532575,0,0,0.49302368,-4.5657921,-11.94789)">
       <path
          d="m 51.574219,48.786486 q 0,3.867187 -1.367188,7.1875 -1.328125,3.28125 -3.75,5.703125 -3.007812,3.007812 -7.109375,4.53125 -4.101562,1.484375 -10.351562,1.484375 l -7.734375,0 0,21.679687 -7.734375,0 0,-58.164062 15.78125,0 q 5.234375,0 8.867187,0.898437 3.632813,0.859375 6.445313,2.734375 3.320312,2.226563 5.117187,5.546875 1.835938,3.320313 1.835938,8.398438 z m -8.046875,0.195312 q 0,-3.007812 -1.054688,-5.234375 -1.054687,-2.226562 -3.203125,-3.632812 -1.875,-1.210938 -4.296875,-1.71875 -2.382812,-0.546875 -6.054687,-0.546875 l -7.65625,0 0,23.242187 6.523437,0 q 4.6875,0 7.617188,-0.820312 2.929687,-0.859375 4.765625,-2.695313 1.835937,-1.875 2.578125,-3.945312 0.78125,-2.070313 0.78125,-4.648438 z"
          id="path3393"

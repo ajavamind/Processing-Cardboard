@@ -24,40 +24,41 @@ package com.modla.andy.processingcardboard;
 
 /**
  * Description
- * This example program is an Android activity coded with the Processing for Android library and
- * the Google Cardboard Android SDK.
- * The Processing library has an abstraction layer for OPENGL that makes it possible
- * to write an Android Cardboard app without needing direct Android OPENGL calls.
- * Using Processing with Cardboard SDK may be an alternative for writing Android VR applications.
+ * This Android app is an example Cardboard VR program coded using the Processing for Android
+ * library and the Google Cardboard Android SDK.
+ *
  * <p/>
+ * The Processing library has an abstraction layer for OPENGL making it possible
+ * to write an Android Cardboard app without needing direct Android OPENGL calls.
+ * Using Processing with Cardboard SDK is an alternative for writing Android VR applications.
  *
  * <p/>
  * Requires Android Studio (1.2.2)
  * <p/>
- * Cardboard SDK for Android 0.5.4
+ * Cardboard SDK for Android 0.5.5
  * <p/>
- * minimum Android API 4.1 (16)
+ * Minimum Android API 4.1 (16)
  * <p/>
- * Tested with Sony Z1S phone, 1920x1080 pixel display, running Android version 5.0.2, GPU hardware
+ * Tested with Sony Z1S phone, 1920x1080 pixel display, running Android version 5.0.2, and
+ * hardware accelerated GPU
  *
  * <p/>
- * issues:
+ * Issues:
  * Distortion correction is disabled because the Cardboard correction feature does not work well
  * The display is not distorted enough to matter with my Unofficial cardboard viewer lens and
  * home made viewer with stereoscopic quality lens.
  * <p/>
- * Out of memory using large images
+ * Out of memory can occur when using large images and restarting the app
  * <p/>
+ * Processing-Cardboard Library build for Processing 2.2.1 IDE not implemented. Here the library
+ * is included with the app as Processing source code.
  * <p/>
+ *
  * notes:
  * The magnet trigger does not work well with my phone so I use new convert tap to trigger feature
  * available in Cardboard V2.
  * <p/>
- * No library build was defined for processing SDK since this is a work in progress
- * <p/>
- * PStereo was not hidden in PApplet for greater control. Abstraction functions possible.
- * <p/>
- * Changes to Processing Library:
+ * Changes made to Processing-Anddroid core library:
  * <p/>
  * PApplet extends CardboardActivity
  * <p/>
@@ -69,8 +70,11 @@ package com.modla.andy.processingcardboard;
  * <p/>
  * CardboardView.StereoRenderer code is also available
  * <p/>
- * added PStereo class for stereo view control
+ * PStereo class added to Processing core for stereo view control
  * <p/>
+ *
+ *
+ *
  * Cardboard is a trademark of Google Inc.
  */
 
@@ -81,11 +85,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Vibrator;
+import android.view.KeyEvent;
 
 import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.HeadTransform;
 
 import processing.core.PApplet;
+import processing.core.PFont;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PShape;
 import processing.core.PStereo;
@@ -212,11 +219,19 @@ public class MainActivity extends PApplet {
         Log.d(TAG, "onStart");
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+        // TODO release image resources
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Processing sketch for the Android app
+    // Processing sketch for the Android app starts here.
     // The app shows a rotating stereo photo cube in front of a 3D background photo.
     // Head movement/direction or keyboard input determines the viewers location and direction.
-    // Tap the screen to reset to starting view.
+    // Tap the screen to reset to starting view or swipe to rotate the photo cube.
+    // The app displays text and graphics including a reticle.
     //
 
     float rotx = 0; //PI / 4;
@@ -226,8 +241,10 @@ public class MainActivity extends PApplet {
     PShape texCubeRight;
     PShape backgroundFrameLeft;
     PShape backgroundFrameRight;
-    PShape textS;
-    PShape textG;
+    PShape textSVG;
+    PShape textImage;
+    PShape reticle;
+    PFont font;
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
@@ -254,7 +271,6 @@ public class MainActivity extends PApplet {
     @Override
     public void setup() {
         background(0);
-        strokeWeight(8.0f);
         // load images for cube face textures
         if (photo == null) {
             photo = new PImage[6];
@@ -275,12 +291,19 @@ public class MainActivity extends PApplet {
             //backgroundRight = loadImage("data/IMG_0338_r.JPG");
             backgroundLeft = loadImage("data/IMG_0526_l.JPG");
             backgroundRight = loadImage("data/IMG_0526_r.JPG");
-            textS = loadShape("data/text.svg");
+            textSVG = loadShape("data/text.svg");
         }
         texCube = createCube(photo);
         texCubeRight = createCube(photoRight);
         backgroundFrameLeft = createFrame(backgroundLeft);
         backgroundFrameRight = createFrame(backgroundRight);
+        reticle = createReticle();
+        font = createFont("Georgia", 32);
+        textFont(font);
+
+        //textMode(SHAPE);  // TODO not supported in Processing-Android
+        textSize(32);
+        textImage = createTextGraphics("Photo Cube");
 
         /* second constructor, custom eye separation, custom convergence */
         stereo = new PStereo(
@@ -290,21 +313,14 @@ public class MainActivity extends PApplet {
                 convPlane);
 
         //println("Screen Width="+ width + " Height="+height);
-        // only needs to be called repeatedly if you are
-        // changing camera position
+        // start only needs to be called repeatedly if you are
+        // changing camera position, which we are doing
         stereo.start(
                 cameraPositionX, cameraPositionY, cameraPositionZ,
                 0f, 0f, -1f,  // directionX, directionY, directionZ
                 0f, 1f, 0f);  // upX, upY, upZ
         cardboardView.resetHeadTracker();
-        //textMode(SHAPE);  // TODO not supported in Processing-Android
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop");
-        // TODO release image resources
     }
 
     PShape createCube(PImage[] photo) {
@@ -378,8 +394,8 @@ public class MainActivity extends PApplet {
     PShape createFrame(PImage photo) {
         PShape face = createShape();
         face.beginShape(QUAD);
-        //face.noStroke();
-        face.stroke(0);
+        face.noStroke();
+        //face.stroke(0);
         face.textureMode(NORMAL);
         face.texture(photo);
         face.vertex(-1, -1, 0, 0, 0);
@@ -390,20 +406,56 @@ public class MainActivity extends PApplet {
         return face;
     }
 
-    PShape createText(String t) {
-        PImage texture = createImage(100, 20, RGB);
-        text(t, 0, 0);
-        //loadPixels();  // TODO not implemented in Processing-Android
-        texture.loadPixels();
-        for (int i=0; i<pixels.length; i++) {
-            texture.pixels[i] = pixels[i];
-        }
-        texture.updatePixels();
+    PShape createReticle() {
+        final int RADIUS = 64;
+        PGraphics buffer = createGraphics(RADIUS, RADIUS);
+        buffer.beginDraw();
+        buffer.background(0, 0);  // transparent
+        buffer.stroke(255);
+        buffer.strokeWeight(4);
+        buffer.ellipseMode(CENTER);
+        buffer.ellipse(RADIUS / 2, RADIUS / 2, RADIUS / 3, RADIUS / 3);
+        buffer.strokeWeight(8.0f);
+        buffer.line(RADIUS/2, 0, RADIUS/2, RADIUS - 1);
+        buffer.line(0, RADIUS/2, RADIUS-1, RADIUS/2);
+        buffer.endDraw();
         PShape face = createShape();
         face.beginShape(QUAD);
         face.noStroke();
         face.textureMode(NORMAL);
-        face.texture(texture);
+        face.texture(buffer);
+        face.vertex(-1, -1, 0, 0, 0);
+        face.vertex(1, -1, 0, 1, 0);
+        face.vertex(1, 1, 0, 1, 1);
+        face.vertex(-1, 1, 0, 0, 1);
+        face.endShape();
+        return face;
+    }
+
+    PShape createTextGraphics(String s) {
+        PGraphics buffer = createGraphics(width/2, height);
+        buffer.beginDraw();
+        buffer.strokeWeight(8.0f);
+        buffer.background(color(0,128,0));
+        buffer.stroke(0xff, 0, 0);
+        buffer.text(s, 0, height / 4);
+        buffer.stroke(255);
+        buffer.textSize(64f);
+        buffer.text(s, 0, height / 3);
+        buffer.stroke(0x0000FF);
+        buffer.textSize(128);
+        buffer.text(s, 0, height / 2 + height / 4);
+        buffer.fill(color(128, 0, 128));
+        buffer.rect(400, 200, 400, 400);
+        buffer.stroke(128);
+        buffer.line(0, 0, width / 2, height);
+        buffer.endDraw();
+
+        PShape face = createShape();
+        face.beginShape(QUAD);
+        face.noStroke();
+        face.textureMode(NORMAL);
+        face.texture(buffer);
         face.vertex(-1, -1, 0, 0, 0);
         face.vertex(1, -1, 0, 1, 0);
         face.vertex(1, 1, 0, 1, 1);
@@ -427,10 +479,29 @@ public class MainActivity extends PApplet {
         popMatrix();
     }
 
-    void drawText(PShape s) {
+    void drawSVG(PShape s) {
         pushMatrix();
-        scale(.02f);
+        scale(10.0f);
         translate(-100, 100, 140);
+        s.disableStyle();
+        noFill();
+        stroke(0);
+        shape(s);
+        popMatrix();
+    }
+
+    void drawReticle(float sc) {
+        pushMatrix();
+        translate(cameraPositionX, cameraPositionY, cameraPositionZ - STARTZ + 8f);
+        scale(sc);  // 1.0f
+        shape(reticle);
+        popMatrix();
+    }
+
+    void drawTextGraphics(PShape s) {
+        pushMatrix();
+        scale(8);
+        translate(0, 0, -.25f);
         shape(s);
         popMatrix();
     }
@@ -455,9 +526,9 @@ public class MainActivity extends PApplet {
         // normalize quaternion
         float length = (float) Math.sqrt(quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3]);
         int DIV = 10;
-        float lowSpeed = .005f;
-        float mediumSpeed = .01f;
-        float highSpeed = .02f;
+        float lowSpeed = .01f;  //.005f;
+        float mediumSpeed = .02f;  //.01f;
+        float highSpeed = .04f;  //.02f;
         float pitchSpeed = 0;
         float yawSpeed = 0;
         float rollSpeed = 0;
@@ -553,7 +624,8 @@ public class MainActivity extends PApplet {
         stereo.left();
         drawFrame(backgroundFrameLeft);
         drawPhotoCube(texCube);
-        drawText(textS);
+        drawReticle(.1f);
+        drawTextGraphics(textImage);
     }
 
     /**
@@ -564,8 +636,9 @@ public class MainActivity extends PApplet {
         stereo.right();
         drawFrame(backgroundFrameRight);
         drawPhotoCube(texCubeRight);
-        drawText(textS);
-    }
+        drawReticle(.1f);
+        drawTextGraphics(textImage);
+   }
 
     /**
      * Processing draw function. Called before drawLeft and drawRight.
@@ -577,14 +650,14 @@ public class MainActivity extends PApplet {
                 cameraPositionX, cameraPositionY, cameraPositionZ,
                 0f, 0f, -1f,  // directionX, directionY, directionZ
                 0f, 1f, 0f);  // upX, upY, upZ
-        background(0);
+        background(128);
     }
 
-    int KEYCODE_MEDIA_NEXT = 87; // RIGHT
-    int KEYCODE_MEDIA_PREVIOUS = 88;  // LEFT
-    int KEYCODE_MEDIA_FAST_FORWARD = 90;  // UP
-    int KEYCODE_MEDIA_REWIND = 89;  // DOWN
-    int KEYCODE_ENTER = 66;
+    int KEYCODE_MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
+    int KEYCODE_MEDIA_PREVIOUS = KeyEvent.KEYCODE_MEDIA_PREVIOUS;   // LEFT
+    int KEYCODE_MEDIA_FAST_FORWARD = KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;    // UP
+    int KEYCODE_MEDIA_REWIND = KeyEvent.KEYCODE_MEDIA_REWIND;    // DOWN
+    int KEYCODE_ENTER = KeyEvent.KEYCODE_ENTER;
 
     public void keyPressed() {
         println("keyCode=" + keyCode);
@@ -601,7 +674,6 @@ public class MainActivity extends PApplet {
         } else if (keyCode == KEYCODE_ENTER) {
             resetTracker();
         }
-
     }
 
 }
