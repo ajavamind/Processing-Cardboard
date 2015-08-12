@@ -361,6 +361,12 @@ public interface PConstants {
   static final int DOWN      = KeyEvent.KEYCODE_DPAD_DOWN;
   static final int LEFT      = KeyEvent.KEYCODE_DPAD_LEFT;
   static final int RIGHT     = KeyEvent.KEYCODE_DPAD_RIGHT;
+  static final int MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
+  static final int MEDIA_PREVIOUS = KeyEvent.KEYCODE_MEDIA_PREVIOUS;   // LEFT
+  static final int MEDIA_FAST_FORWARD = KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;    // UP
+  static final int MEDIA_REWIND = KeyEvent.KEYCODE_MEDIA_REWIND;    // DOWN
+  static final int KEYCODE_ENTER = KeyEvent.KEYCODE_ENTER;
+
 
   // These seem essential for most sketches, so they're included.
   // Others can be found in the KeyEvent reference:

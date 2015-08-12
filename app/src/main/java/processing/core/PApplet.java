@@ -39,6 +39,7 @@ import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.*;
 import android.net.Uri;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,10 +67,17 @@ import processing.opengl.*;
 
 public class PApplet extends CardboardActivity
         implements PConstants, Runnable {
+    private static String TAG = "PApplet";
+
     /**
      * The PGraphics renderer associated with this PApplet
      */
     public PGraphics g;
+
+    /**
+     * Stereo view for Cardboard
+     */
+    public PStereo pStereo;
 
     //static final public boolean DEBUG = true;
     static final public boolean DEBUG = false;
@@ -887,6 +895,54 @@ public class PApplet extends CardboardActivity
 
 
     //////////////////////////////////////////////////////////////
+
+    public void stereoView(int width, int height, float eyeSeparation, float fieldOfViewY, float nearPlane, float farPlane,  float convPlane) {
+            /* second constructor, custom eye separation, custom convergence */
+        pStereo = new PStereo(
+                this, width, height, eyeSeparation, fieldOfViewY,
+                nearPlane,
+                farPlane, PStereo.StereoType.SIDE_BY_SIDE,
+                convPlane);
+    }
+
+    public void stereoPosition(
+            float posx, float posy, float posz,
+            float dirx, float diry, float dirz,
+            float upx, float upy, float upz) {
+        if (pStereo != null) {
+            pStereo.start(posx, posy, posz,
+                    dirx, diry, dirz,
+                    upx, upy, upz);
+        }
+    }
+
+    /**
+     * Checks if we've had an error inside of OpenGL ES, and if so what that error is.
+     *
+     * @param label Label to report in case of error.
+     */
+    public static void checkGLError(String label) {
+        int error;
+        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+            Log.e(TAG, label + ": glError " + error);
+            throw new RuntimeException(label + ": glError " + error);
+        }
+    }
+
+    public static void clearGlError() {
+        while (GLES20.glGetError() != GLES20.GL_NO_ERROR) {
+            ;
+        }
+    }
+
+    public static void checkGlError(String op) {
+        int error;
+        if ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+            Log.e(TAG, op + ": glError " + error);
+            throw new RuntimeException(op + ": glError " + error);
+        }
+    }
+
 
     // ANDROID SURFACE VIEW
 
@@ -2436,6 +2492,7 @@ public class PApplet extends CardboardActivity
                 draw();
                 pushMatrix();
                 translate(0, 0);
+                pStereo.left();
                 drawLeft();
                 popMatrix();
             }
@@ -2449,6 +2506,7 @@ public class PApplet extends CardboardActivity
         else if (!monocular) {
             pushMatrix();
             translate(displayWidth / 2, 0);
+            pStereo.right();
             drawRight();
             popMatrix();
         }

@@ -87,8 +87,8 @@ public class PStereo {
         this.nearPlane = nearPlane;
         this.farPlane = farPlane;
         this.fovy = fovy;
-        this.convPlane = (float) (nearPlane + (farPlane - nearPlane) / 100.0f);
-        this.eyeSeperation = (float) convPlane / 30.f;
+        this.convPlane = nearPlane + (farPlane - nearPlane) / 100.0f;
+        this.eyeSeperation =  convPlane / 30.f;
         this.stereoType = stereoType;
 
     }
@@ -142,11 +142,11 @@ public class PStereo {
         }
 
         // Set frustum
-        float top = (float)(widthdiv2);
-        float bottom = (float)(-widthdiv2);
-        float left = (float)(-aspectRatio * widthdiv2 - 0.5f * eyeSeperation * nearPlane / convPlane);
-        float right = (float)(aspectRatio * widthdiv2 - 0.5f * eyeSeperation * nearPlane / convPlane);
-        app.frustum(left, right, bottom, top, (float) nearPlane, (float) farPlane);
+        float top = widthdiv2;
+        float bottom = -widthdiv2;
+        float left = (-aspectRatio * widthdiv2 - 0.5f * eyeSeperation * nearPlane / convPlane);
+        float right = (aspectRatio * widthdiv2 - 0.5f * eyeSeperation * nearPlane / convPlane);
+        app.frustum(left, right, bottom, top, nearPlane, farPlane);
 
         // Set camera
         app.camera(
@@ -168,11 +168,11 @@ public class PStereo {
         }
 
         // Set frustum
-        float top = (float)(widthdiv2);
-        float bottom = (float)(-widthdiv2);
-        float left = (float)(-aspectRatio * widthdiv2 + 0.5f * eyeSeperation * nearPlane / convPlane);
-        float right = (float)(aspectRatio * widthdiv2 + 0.5f * eyeSeperation * nearPlane / convPlane);
-        app.frustum(left, right, bottom, top, (float) nearPlane, (float) farPlane);
+        float top = widthdiv2;
+        float bottom = -widthdiv2;
+        float left = (-aspectRatio * widthdiv2 + 0.5f * eyeSeperation * nearPlane / convPlane);
+        float right = (aspectRatio * widthdiv2 + 0.5f * eyeSeperation * nearPlane / convPlane);
+        app.frustum(left, right, bottom, top, nearPlane, farPlane);
 
         // Set camera
         app.camera(

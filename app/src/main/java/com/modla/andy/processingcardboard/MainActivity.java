@@ -79,13 +79,11 @@ package com.modla.andy.processingcardboard;
  */
 
 import android.content.Context;
-import android.opengl.GLES20;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Vibrator;
-import android.view.KeyEvent;
 
 import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.HeadTransform;
@@ -95,7 +93,6 @@ import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PShape;
-import processing.core.PStereo;
 
 
 public class MainActivity extends PApplet {
@@ -165,33 +162,6 @@ public class MainActivity extends PApplet {
         resetTracker();
     }
 
-    /**
-     * Checks if we've had an error inside of OpenGL ES, and if so what that error is.
-     *
-     * @param label Label to report in case of error.
-     */
-    private static void checkGLError(String label) {
-        int error;
-        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e(TAG, label + ": glError " + error);
-            throw new RuntimeException(label + ": glError " + error);
-        }
-    }
-
-    private static void clearGlError() {
-        while (GLES20.glGetError() != GLES20.GL_NO_ERROR) {
-            ;
-        }
-    }
-
-    private static void checkGlError(String op) {
-        int error;
-        if ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e(TAG, op + ": glError " + error);
-            throw new RuntimeException(op + ": glError " + error);
-        }
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -253,7 +223,6 @@ public class MainActivity extends PApplet {
     float cameraPositionX = STARTX;
     float cameraPositionY = STARTY;
     float cameraPositionZ = STARTZ;
-    PStereo stereo = null;
     float[] headView = new float[16];
 
     @Override
@@ -305,20 +274,16 @@ public class MainActivity extends PApplet {
         textSize(32);
         textImage = createTextGraphics("Photo Cube");
 
-        /* second constructor, custom eye separation, custom convergence */
-        stereo = new PStereo(
-                this, width, height, eyeSeparation, fieldOfViewY,
-                nearPlane,
-                farPlane, PStereo.StereoType.SIDE_BY_SIDE,
-                convPlane);
+        // set up stereo view
+        stereoView(width, height, eyeSeparation, fieldOfViewY, nearPlane, farPlane, convPlane);
 
         //println("Screen Width="+ width + " Height="+height);
-        // start only needs to be called repeatedly if you are
+        // stereoPosition only needs to be called repeatedly if you are
         // changing camera position, which we are doing
-        stereo.start(
-                cameraPositionX, cameraPositionY, cameraPositionZ,
+        stereoPosition(cameraPositionX, cameraPositionY, cameraPositionZ,
                 0f, 0f, -1f,  // directionX, directionY, directionZ
                 0f, 1f, 0f);  // upX, upY, upZ
+
         cardboardView.resetHeadTracker();
 
     }
@@ -600,7 +565,7 @@ public class MainActivity extends PApplet {
                     (cameraPositionZ <= ZBOUND_OUT && cameraPositionZ >= ZBOUND_IN))
                 cameraPositionZ += rollSpeed;
 
-            //Log.d(TAG, "Normalized quaternion " + pitch + " " + yaw + " " + roll + " Camera position "+ cameraPositionX + " " + cameraPositionY + " " + cameraPositionZ);
+//            Log.d(TAG, "Normalized quaternion " + pitch + " " + yaw + " " + roll + " Camera position "+ cameraPositionX + " " + cameraPositionY + " " + cameraPositionZ);
         } else {
             Log.d(TAG, "Quaternion 0");
         }
@@ -621,7 +586,6 @@ public class MainActivity extends PApplet {
      */
     @Override
     public void drawLeft() {
-        stereo.left();
         drawFrame(backgroundFrameLeft);
         drawPhotoCube(texCube);
         drawReticle(.1f);
@@ -633,7 +597,6 @@ public class MainActivity extends PApplet {
      */
     @Override
     public void drawRight() {
-        stereo.right();
         drawFrame(backgroundFrameRight);
         drawPhotoCube(texCubeRight);
         drawReticle(.1f);
@@ -646,32 +609,26 @@ public class MainActivity extends PApplet {
     @Override
     public void draw() {
         //println("draw()");
-        stereo.start(
+        background(0);
+        stereoPosition(
                 cameraPositionX, cameraPositionY, cameraPositionZ,
                 0f, 0f, -1f,  // directionX, directionY, directionZ
                 0f, 1f, 0f);  // upX, upY, upZ
-        background(128);
     }
-
-    int KEYCODE_MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
-    int KEYCODE_MEDIA_PREVIOUS = KeyEvent.KEYCODE_MEDIA_PREVIOUS;   // LEFT
-    int KEYCODE_MEDIA_FAST_FORWARD = KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;    // UP
-    int KEYCODE_MEDIA_REWIND = KeyEvent.KEYCODE_MEDIA_REWIND;    // DOWN
-    int KEYCODE_ENTER = KeyEvent.KEYCODE_ENTER;
 
     public void keyPressed() {
         println("keyCode=" + keyCode);
         Log.d(TAG, "keyCode=" + keyCode);
 
-        if (keyCode == LEFT || keyCode == KEYCODE_MEDIA_PREVIOUS) {
+        if (keyCode == LEFT || keyCode == MEDIA_PREVIOUS) {
             rotx += PI / 4;
-        } else if (keyCode == RIGHT || keyCode == KEYCODE_MEDIA_NEXT) {
+        } else if (keyCode == RIGHT || keyCode == MEDIA_NEXT) {
             rotx -= PI / 4;
-        } else if (keyCode == UP || keyCode == KEYCODE_MEDIA_FAST_FORWARD) {
+        } else if (keyCode == UP || keyCode == MEDIA_FAST_FORWARD) {
             roty += PI / 4;
-        } else if (keyCode == DOWN || keyCode == KEYCODE_MEDIA_REWIND) {
+        } else if (keyCode == DOWN || keyCode == MEDIA_REWIND) {
             roty -= PI / 4;
-        } else if (keyCode == KEYCODE_ENTER) {
+        } else if (keyCode == KEYCODE_ENTER || keyCode == ENTER) {
             resetTracker();
         }
     }
