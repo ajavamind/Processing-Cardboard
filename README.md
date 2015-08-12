@@ -1,5 +1,6 @@
 # Processing-Cardboard
-Example Processing-Android Cardboard Stereo photo/VR sketch using Google Android Cardboard SDK
+This repository is an implementation of Processing-Android with Google Android Cardboard SDK.
+With this code you can write Processing sketches for Android apps to use stereo photo and Google Cardboard/VR features.
 
  This example Android app for Google Cardboard demonstrates coding with the Processing Language for Android library and
  the Google Cardboard Android SDK. The objective of this work is to provide an easier 
@@ -11,9 +12,9 @@ Example Processing-Android Cardboard Stereo photo/VR sketch using Google Android
  Processing with Cardboard SDK is an alternative for writing Android VR applications. At the least it is
  another way to build/explore/learn the Cardboard VR app development platform.
  
- * Requires Android Studio (1.2.2)
+ * Uses Android Studio (1.3.1)
  * Cardboard SDK for Android 0.5.5
- * Based on Processing for Android library version 2.2.1 with Processing core source code from: https://github.com/processing/processing-android
+ * Based on Processing for Android library version 2.2.1 with Processing core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
  
  * Minimum builds supports Android API 4.1 (16) platform and above
@@ -41,7 +42,9 @@ Distortion correction is disabled because the Cardboard correction feature does 
 
  * PApplet extends CardboardActivity
  
- * The display thread in Processing that calls draw() was replaced by the main thread used by Cardboard SDK for its display rendering. Added draw functions for left and right eye in Processing
+ * The main display thread used by Cardboard SDK for its display rendering replaces the display thread in Processing Android that calls draw().
+
+ * Added draw functions for left and right eye in Processing
 
  * SketchSurfaceView extends CardboardView
 
