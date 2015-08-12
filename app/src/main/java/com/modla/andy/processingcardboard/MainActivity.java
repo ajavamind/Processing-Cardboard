@@ -218,7 +218,7 @@ public class MainActivity extends PApplet {
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
-    float eyeSeparation;
+    float eyeSeparation = convPlane/30.0f;
     float fieldOfViewY = 45f;
     float cameraPositionX = STARTX;
     float cameraPositionY = STARTY;
@@ -457,7 +457,7 @@ public class MainActivity extends PApplet {
 
     void drawReticle(float sc) {
         pushMatrix();
-        translate(cameraPositionX, cameraPositionY, cameraPositionZ - STARTZ + 8f);
+        translate(cameraPositionX, cameraPositionY, cameraPositionZ - STARTZ);
         scale(sc);  // 1.0f
         shape(reticle);
         popMatrix();

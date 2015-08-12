@@ -24,7 +24,7 @@ public class PStereo {
     }
 
     public StereoType stereoType = null;
-    public float eyeSeperation;
+    public float eyeSeparation;
     PApplet app = null;
     PGL pgl; //Processing-OpenGL abstraction layer.
     float aspectRatio, nearPlane, farPlane, widthdiv2, convPlane;
@@ -36,7 +36,7 @@ public class PStereo {
     float rightx, righty, rightz;
 
     // constructor convergence distance is calculated as 30 times the eye separation
-    public PStereo(PApplet app, int width, int height, float eyeSeperation, float fovy, float nearPlane, float farPlane, StereoType stereoType) {
+    public PStereo(PApplet app, int width, int height, float eyeSeparation, float fovy, float nearPlane, float farPlane, StereoType stereoType) {
         this.app = app;
         this.width = width;
         this.height = height;
@@ -44,14 +44,14 @@ public class PStereo {
         this.nearPlane = nearPlane;
         this.farPlane = farPlane;
         this.fovy = fovy;
-        this.eyeSeperation = eyeSeperation;
-        this.convPlane = eyeSeperation * 30.0f;
+        this.eyeSeparation = eyeSeparation;
+        this.convPlane = eyeSeparation * 30.0f;
         this.stereoType = stereoType;
 
     }
 
     // second constructor eye separation and conv plane are explictly set
-    public PStereo(PApplet app, int width, int height, float eyeSeperation, float fovy, float nearPlane, float farPlane, StereoType stereoType, float convPlane) {
+    public PStereo(PApplet app, int width, int height, float eyeSeparation, float fovy, float nearPlane, float farPlane, StereoType stereoType, float convPlane) {
         this.app = app;
         this.width = width;
         this.height = height;
@@ -59,7 +59,7 @@ public class PStereo {
         this.nearPlane = nearPlane;
         this.farPlane = farPlane;
         this.fovy = fovy;
-        this.eyeSeperation = eyeSeperation;
+        this.eyeSeparation = eyeSeparation;
         this.convPlane = convPlane;
         this.stereoType = stereoType;
     }
@@ -74,7 +74,7 @@ public class PStereo {
         this.farPlane = farPlane;
         this.fovy = fovy;
         this.convPlane = convPlane;
-        this.eyeSeperation = convPlane / 30.0f;
+        this.eyeSeparation = convPlane / 30.0f;
         this.stereoType = stereoType;
     }
 
@@ -88,7 +88,7 @@ public class PStereo {
         this.farPlane = farPlane;
         this.fovy = fovy;
         this.convPlane = nearPlane + (farPlane - nearPlane) / 100.0f;
-        this.eyeSeperation =  convPlane / 30.f;
+        this.eyeSeparation =  convPlane / 30.f;
         this.stereoType = stereoType;
 
     }
@@ -121,9 +121,9 @@ public class PStereo {
         PVector cup = new PVector(this.upx, this.upy, this.upz);
         PVector cright = cdir.cross(cup);
 
-        this.rightx = cright.x * eyeSeperation / 2.0f;
-        this.righty = cright.y * eyeSeperation / 2.0f;
-        this.rightz = cright.z * eyeSeperation / 2.0f;
+        this.rightx = cright.x * eyeSeparation / 2.0f;
+        this.righty = cright.y * eyeSeparation / 2.0f;
+        this.rightz = cright.z * eyeSeparation / 2.0f;
     }
 
     public void end() {
@@ -144,8 +144,8 @@ public class PStereo {
         // Set frustum
         float top = widthdiv2;
         float bottom = -widthdiv2;
-        float left = (-aspectRatio * widthdiv2 - 0.5f * eyeSeperation * nearPlane / convPlane);
-        float right = (aspectRatio * widthdiv2 - 0.5f * eyeSeperation * nearPlane / convPlane);
+        float left = (-aspectRatio * widthdiv2 - 0.5f * eyeSeparation * nearPlane / convPlane);
+        float right = (aspectRatio * widthdiv2 - 0.5f * eyeSeparation * nearPlane / convPlane);
         app.frustum(left, right, bottom, top, nearPlane, farPlane);
 
         // Set camera
@@ -170,8 +170,8 @@ public class PStereo {
         // Set frustum
         float top = widthdiv2;
         float bottom = -widthdiv2;
-        float left = (-aspectRatio * widthdiv2 + 0.5f * eyeSeperation * nearPlane / convPlane);
-        float right = (aspectRatio * widthdiv2 + 0.5f * eyeSeperation * nearPlane / convPlane);
+        float left = (-aspectRatio * widthdiv2 + 0.5f * eyeSeparation * nearPlane / convPlane);
+        float right = (aspectRatio * widthdiv2 + 0.5f * eyeSeparation * nearPlane / convPlane);
         app.frustum(left, right, bottom, top, nearPlane, farPlane);
 
         // Set camera
