@@ -25,7 +25,8 @@ package com.modla.andy.processingcardboard;
 /**
  * Description
  * This Android app is an example Cardboard VR program coded using the Processing for Android
- * library and the Google Cardboard Android SDK.
+ * library and the Google Cardboard Android SDK. The app displays an OBJ model rocket and allows
+ * keyboard input to rotate, zoom with head tilt and pan left or right.
  *
  * <p/>
  * The Processing library has an abstraction layer for OPENGL making it possible
@@ -33,7 +34,7 @@ package com.modla.andy.processingcardboard;
  * Using Processing with Cardboard SDK is an alternative for writing Android VR applications.
  *
  * <p/>
- * Requires Android Studio (1.2.2)
+ * Built with Android Studio (1.3.1)
  * <p/>
  * Cardboard SDK for Android 0.5.5
  * <p/>
@@ -79,11 +80,9 @@ package com.modla.andy.processingcardboard;
  */
 
 import android.content.Context;
-import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -91,11 +90,8 @@ import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.HeadTransform;
 
 import processing.core.PApplet;
-import processing.core.PFont;
-import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PShape;
-import processing.core.PStereo;
 
 
 public class DisplayOBJActivity extends PApplet {
@@ -103,10 +99,6 @@ public class DisplayOBJActivity extends PApplet {
 
     CardboardView cardboardView;
     private Vibrator vibrator;
-    PImage[] photo = null;
-    PImage[] photoRight = null;
-    PImage backgroundLeft = null;
-    PImage backgroundRight = null;
 
     static final float STARTX = 0f;
     static final float STARTY = 0f;
@@ -242,7 +234,7 @@ public class DisplayOBJActivity extends PApplet {
                 convPlane);
 
         //println("Screen Width="+ width + " Height="+height);
-        // start only needs to be called repeatedly if you are
+        // stereoPosition only needs to be called repeatedly if you are
         // changing camera position, which we are doing
         stereoPosition(
                 cameraPositionX, cameraPositionY, cameraPositionZ,
