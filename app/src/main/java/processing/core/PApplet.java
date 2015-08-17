@@ -2490,11 +2490,8 @@ public class PApplet extends CardboardActivity
             }
             else {
                 draw();
-                pushMatrix();
-                translate(0, 0);
                 pStereo.left();
                 drawLeft();
-                popMatrix();
             }
         }
     }
@@ -2504,15 +2501,12 @@ public class PApplet extends CardboardActivity
             g.endDraw();
         }
         else if (!monocular) {
-            pushMatrix();
-            translate(displayWidth / 2, 0);
+            g.endDraw();
+            g.beginDraw();
             pStereo.right();
             drawRight();
-            popMatrix();
         }
         if (frameCount> 0) {
-            //println("Done calling draw()");
-            // drawRight();
             // dmouseX/Y is updated only once per frame (unlike emouseX/Y)
             dmouseX = mouseX;
             dmouseY = mouseY;
@@ -2531,7 +2525,6 @@ public class PApplet extends CardboardActivity
 
             redraw = false;  // unset 'redraw' flag in case it was set
             // (only do this once draw() has run, not just setup())
-
 
             g.endDraw();
         }

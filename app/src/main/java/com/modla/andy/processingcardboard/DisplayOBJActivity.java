@@ -254,6 +254,33 @@ public class DisplayOBJActivity extends PApplet {
         popMatrix();
     }
 
+    public void drawText(String s, float x) {
+        stroke(255);
+        fill(255);
+        scale(.05f);
+        pushMatrix();
+        text(s, x, 0, 5);
+        popMatrix();
+    }
+
+    public void drawGrid() {
+        int gridSize = 1;
+        stroke(128);
+        fill(64);
+        pushMatrix();
+        for(int i = -20; i <20; i+=gridSize) {
+            for(int j = -20; j < 20; j+=gridSize) {
+                int y = 1;
+                int z = 0;
+                line(i,          y, j,           i+gridSize, y, j          );
+                line(i+gridSize, y, j,           i+gridSize, y, j+gridSize );
+                line(i+gridSize, y, j+gridSize,  i,          y, j+gridSize );
+                line(i,          y, j,           i,          y, j+gridSize );
+            }
+        }
+        popMatrix();
+    }
+
     public void mouseDragged() {
         float rate = 0.01f;
         rotx += (pmouseY - mouseY) * rate;
@@ -370,6 +397,8 @@ public class DisplayOBJActivity extends PApplet {
     @Override
     public void drawLeft() {
         drawShape(rocket);
+        drawGrid();
+        drawText("ROCKET", 30.0f);
     }
 
     /**
@@ -378,7 +407,9 @@ public class DisplayOBJActivity extends PApplet {
     @Override
     public void drawRight() {
         drawShape(rocket);
-   }
+        drawGrid();
+        drawText("ROCKET", 30.0f);
+    }
 
     /**
      * Processing draw function. Called before drawLeft and drawRight.
