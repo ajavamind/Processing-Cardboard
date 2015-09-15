@@ -365,7 +365,7 @@ public interface PConstants {
   static final int MEDIA_PREVIOUS = KeyEvent.KEYCODE_MEDIA_PREVIOUS;   // LEFT
   static final int MEDIA_FAST_FORWARD = KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;    // UP
   static final int MEDIA_REWIND = KeyEvent.KEYCODE_MEDIA_REWIND;    // DOWN
-  static final int KEYCODE_ENTER = KeyEvent.KEYCODE_ENTER;
+  static final int MEDIA_ENTER = KeyEvent.KEYCODE_ENTER;
 
 
   // These seem essential for most sketches, so they're included.

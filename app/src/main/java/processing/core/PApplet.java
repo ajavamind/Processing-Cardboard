@@ -482,7 +482,9 @@ public class PApplet extends CardboardActivity
         Window window = getWindow();
 
         // Take up as much area as possible
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);  // may need to set in theme properties
+        // the above line does not seem to be needed when using cardboard
+        //  android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
         window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 

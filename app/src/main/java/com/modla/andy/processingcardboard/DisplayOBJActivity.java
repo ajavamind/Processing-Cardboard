@@ -435,7 +435,7 @@ public class DisplayOBJActivity extends PApplet {
             roty += PI / 4;
         } else if (keyCode == DOWN || keyCode == MEDIA_REWIND) {
             roty -= PI / 4;
-        } else if (keyCode == KEYCODE_ENTER) {
+        } else if (keyCode == MEDIA_ENTER) {
             resetTracker();
         }
     }
