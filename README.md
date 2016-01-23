@@ -1,13 +1,13 @@
 # Processing-Cardboard
 This repository is an implementation of Processing-Android with Google Android Cardboard SDK.
-With this code you can write Processing sketches for Android apps to use stereo grahics/photo and Google Cardboard/VR features.
+With this code you can write Processing sketches for Android apps to use stereo graphics/photo and Google Cardboard/VR features.
 
- Included are example Android apps for Google Cardboard to demonstrate coding with the Processing Language for Android library and
- the Google Cardboard Android SDK. The objective of this work is to provide an easier 
+ The objective of this work is to provide an easier 
  development platform using Processing for learning to program VR Android apps intended for the Cardboard HMD viewer.
  The  Processing-Android library was modified to use the Cardboard SDK.
  The Processing library has an abstraction layer for OPENGL that makes it possible
- to write an Android Cardboard app without using direct Android OPENGL calls. 
+ to write an Android Cardboard app without using direct Android OPENGL calls. Included are example Android apps for Google Cardboard   to demonstrate coding with the Processing Language for Android library and
+ the Google Cardboard Android SDK. 
  
  Processing with Cardboard SDK is an alternative for writing Android VR applications. At the least it is
  another way to build/explore/learn the Cardboard VR app development platform.
