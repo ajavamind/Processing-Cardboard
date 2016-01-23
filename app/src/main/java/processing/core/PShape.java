@@ -115,6 +115,9 @@ public class PShape implements PConstants {
   static public final String NO_VERTICES_ERROR =
     "getVertexCount() only works with PATH or GEOMETRY shapes";
 
+  public static final String NOT_A_SIMPLE_VERTEX =
+    "%1$s can not be called on quadratic or bezier vertices";
+
   // boundary box of this shape
   //protected float x;
   //protected float y;
@@ -235,6 +238,9 @@ public class PShape implements PConstants {
 
   /** True if contains 3D data */
   protected boolean is3D = false;
+  
+  protected boolean perVertexStyles = false;
+
 
   // should this be called vertices (consistent with PGraphics internals)
   // or does that hurt flexibility?
@@ -713,6 +719,17 @@ public class PShape implements PConstants {
 
 
   public void normal(float nx, float ny, float nz) {
+  }
+
+
+  public void attribPosition(String name, float x, float y, float z) {
+  }
+
+  public void attribNormal(String name, float nx, float ny, float nz) {
+  }
+
+
+  public void attribColor(String name, int color) {
   }
 
 

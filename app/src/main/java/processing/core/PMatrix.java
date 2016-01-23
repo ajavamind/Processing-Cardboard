@@ -43,7 +43,7 @@ public interface PMatrix {
 
   public void set(float[] source);
 
-  public void set(float m00, float m01, float m02,
+  public void set(float m00, float m01, float m02, 
                   float m10, float m11, float m12);
 
   public void set(float m00, float m01, float m02, float m03,
@@ -85,7 +85,7 @@ public interface PMatrix {
 
   public void apply(PMatrix3D source);
 
-  public void apply(float n00, float n01, float n02,
+  public void apply(float n00, float n01, float n02, 
                     float n10, float n11, float n12);
 
   public void apply(float n00, float n01, float n02, float n03,
@@ -100,7 +100,7 @@ public interface PMatrix {
 
   public void preApply(PMatrix3D left);
 
-  public void preApply(float n00, float n01, float n02,
+  public void preApply(float n00, float n01, float n02, 
                        float n10, float n11, float n12);
 
   public void preApply(float n00, float n01, float n02, float n03,

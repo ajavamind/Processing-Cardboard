@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.modla.andy.processingcardboard" >
+    package="com.modla.andy.processingcardboard"
+    android:versionCode="3"
+    android:versionName="3.0"
+    >
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="com.sonymobile.permission.SYSTEM_UI_VISIBILITY_EXTENSIONS"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
@@ -28,8 +30,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="com.google.intent.category.CARDBOARD" />
             </intent-filter>
         </activity>
         <activity
@@ -40,10 +42,47 @@
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="com.google.intent.category.CARDBOARD" />
             </intent-filter>
         </activity>
+
+        <!-- Experimental code under construction -->
+        <!--<activity-->
+            <!--android:name=".PaintActivity"-->
+            <!--android:label="LightPaintVR"-->
+            <!--android:icon="@mipmap/ic_launcher"-->
+            <!--android:screenOrientation="landscape"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name=".PhotoActivity"-->
+            <!--android:label="Photo Test"-->
+            <!--android:icon="@mipmap/ic_launcher"-->
+            <!--android:screenOrientation="landscape"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!--<category android:name="com.google.intent.category.CARDBOARD" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name=".GridActivity"-->
+            <!--android:label="Grid"-->
+            <!--android:icon="@mipmap/ic_launcher"-->
+            <!--android:screenOrientation="landscape"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
     </application>
 
 </manifest>

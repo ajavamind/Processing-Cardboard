@@ -60,9 +60,9 @@ class PriorityQSort extends PriorityQ {
     int[] order;
     int size, max;
     boolean initialized;
-    Leq leq;
+    PriorityQ.Leq leq;
 
-    public PriorityQSort(Leq leq) {
+    public PriorityQSort(PriorityQ.Leq leq) {
         heap = new PriorityQHeap(leq);
 
         keys = new Object[PriorityQ.INIT_SIZE];
@@ -81,11 +81,11 @@ class PriorityQSort extends PriorityQ {
         keys = null;
     }
 
-    private static boolean LT(Leq leq, Object x, Object y) {
+    private static boolean LT(PriorityQ.Leq leq, Object x, Object y) {
         return (!PriorityQ.LEQ(leq, y, x));
     }
 
-    private static boolean GT(Leq leq, Object x, Object y) {
+    private static boolean GT(PriorityQ.Leq leq, Object x, Object y) {
         return (!PriorityQ.LEQ(leq, x, y));
     }
 

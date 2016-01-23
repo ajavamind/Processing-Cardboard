@@ -361,7 +361,7 @@ public interface PConstants {
   static final int DOWN      = KeyEvent.KEYCODE_DPAD_DOWN;
   static final int LEFT      = KeyEvent.KEYCODE_DPAD_LEFT;
   static final int RIGHT     = KeyEvent.KEYCODE_DPAD_RIGHT;
-  static final int MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
+ static final int MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
   static final int MEDIA_PREVIOUS = KeyEvent.KEYCODE_MEDIA_PREVIOUS;   // LEFT
   static final int MEDIA_FAST_FORWARD = KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;    // UP
   static final int MEDIA_REWIND = KeyEvent.KEYCODE_MEDIA_REWIND;    // DOWN
@@ -428,7 +428,13 @@ public interface PConstants {
   static final int ENABLE_STROKE_PURE         =  9;
   static final int DISABLE_STROKE_PURE        = -9;
 
-  static final int HINT_COUNT                 = 10;
+  static final int ENABLE_BUFFER_READING      =  10;
+  static final int DISABLE_BUFFER_READING     = -10;
+
+  static final int DISABLE_ASYNC_SAVEFRAME    =  11;
+  static final int ENABLE_ASYNC_SAVEFRAME     = -11;
+
+  static final int HINT_COUNT                 =  12;
 
 
   // error messages

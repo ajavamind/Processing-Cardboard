@@ -97,7 +97,7 @@ public class PStereo {
                       float posx, float posy, float posz,
                       float dirx, float diry, float dirz,
                       float upx, float upy, float upz) {
-        this.pgl = ((PApplet) app).beginPGL();
+        this.pgl = app.beginPGL();
         if (this.stereoType == StereoType.SIDE_BY_SIDE) {
             this.aspectRatio = (float) (width / 2.0f) / (float) height;
         } else {

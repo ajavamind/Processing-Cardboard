@@ -32,6 +32,8 @@ import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.Paint.Style;
 
+import com.google.vrtoolkit.cardboard.Eye;
+
 
 /**
  * Subclass for PGraphics that implements the graphics API using
@@ -169,7 +171,7 @@ public class PGraphicsAndroid2D extends PGraphics {
 
   @Override
   public void requestDraw() {
-    parent.handleDraw(0);
+    parent.handleDraw(Eye.Type.MONOCULAR);
   }
 
 

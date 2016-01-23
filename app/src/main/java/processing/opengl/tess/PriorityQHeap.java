@@ -55,22 +55,22 @@
 package processing.opengl.tess;
 
 class PriorityQHeap extends PriorityQ {
-    PQnode[] nodes;
-    PQhandleElem[] handles;
+    PriorityQ.PQnode[] nodes;
+    PriorityQ.PQhandleElem[] handles;
     int size, max;
     int freeList;
     boolean initialized;
-    Leq leq;
+    PriorityQ.Leq leq;
 
 /* really __gl_pqHeapNewPriorityQ */
-    public PriorityQHeap(Leq leq) {
+    public PriorityQHeap(PriorityQ.Leq leq) {
         size = 0;
         max = PriorityQ.INIT_SIZE;
-        nodes = new PQnode[PriorityQ.INIT_SIZE + 1];
+        nodes = new PriorityQ.PQnode[PriorityQ.INIT_SIZE + 1];
         for (int i = 0; i < nodes.length; i++) {
             nodes[i] = new PQnode();
         }
-        handles = new PQhandleElem[PriorityQ.INIT_SIZE + 1];
+        handles = new PriorityQ.PQhandleElem[PriorityQ.INIT_SIZE + 1];
         for (int i = 0; i < handles.length; i++) {
             handles[i] = new PQhandleElem();
         }
@@ -90,8 +90,8 @@ class PriorityQHeap extends PriorityQ {
     }
 
     void FloatDown(int curr) {
-        PQnode[] n = nodes;
-        PQhandleElem[] h = handles;
+        PriorityQ.PQnode[] n = nodes;
+        PriorityQ.PQhandleElem[] h = handles;
         int hCurr, hChild;
         int child;
 
@@ -119,8 +119,8 @@ class PriorityQHeap extends PriorityQ {
 
 
     void FloatUp(int curr) {
-        PQnode[] n = nodes;
-        PQhandleElem[] h = handles;
+        PriorityQ.PQnode[] n = nodes;
+        PriorityQ.PQhandleElem[] h = handles;
         int hCurr, hParent;
         int parent;
 
@@ -163,13 +163,13 @@ class PriorityQHeap extends PriorityQ {
 
         curr = ++size;
         if ((curr * 2) > max) {
-            PQnode[] saveNodes = nodes;
-            PQhandleElem[] saveHandles = handles;
+            PriorityQ.PQnode[] saveNodes = nodes;
+            PriorityQ.PQhandleElem[] saveHandles = handles;
 
             /* If the heap overflows, double its size. */
             max <<= 1;
 //            pq->nodes = (PQnode *)memRealloc( pq->nodes, (size_t) ((pq->max + 1) * sizeof( pq->nodes[0] )));
-            PQnode[] pqNodes = new PQnode[max + 1];
+            PriorityQ.PQnode[] pqNodes = new PriorityQ.PQnode[max + 1];
             System.arraycopy( nodes, 0, pqNodes, 0, nodes.length );
             for (int i = nodes.length; i < pqNodes.length; i++) {
                 pqNodes[i] = new PQnode();
@@ -181,7 +181,7 @@ class PriorityQHeap extends PriorityQ {
             }
 
 //            pq->handles = (PQhandleElem *)memRealloc( pq->handles,(size_t)((pq->max + 1) * sizeof( pq->handles[0] )));
-            PQhandleElem[] pqHandles = new PQhandleElem[max + 1];
+            PriorityQ.PQhandleElem[] pqHandles = new PriorityQ.PQhandleElem[max + 1];
             System.arraycopy( handles, 0, pqHandles, 0, handles.length );
             for (int i = handles.length; i < pqHandles.length; i++) {
                 pqHandles[i] = new PQhandleElem();
@@ -214,8 +214,8 @@ class PriorityQHeap extends PriorityQ {
 /* really __gl_pqHeapExtractMin */
     @Override
     Object pqExtractMin() {
-        PQnode[] n = nodes;
-        PQhandleElem[] h = handles;
+        PriorityQ.PQnode[] n = nodes;
+        PriorityQ.PQhandleElem[] h = handles;
         int hMin = n[1].handle;
         Object min = h[hMin].key;
 
@@ -237,8 +237,8 @@ class PriorityQHeap extends PriorityQ {
 /* really __gl_pqHeapDelete */
     @Override
     void pqDelete(int hCurr) {
-        PQnode[] n = nodes;
-        PQhandleElem[] h = handles;
+        PriorityQ.PQnode[] n = nodes;
+        PriorityQ.PQhandleElem[] h = handles;
         int curr;
 
         assert (hCurr >= 1 && hCurr <= max && h[hCurr].key != null);

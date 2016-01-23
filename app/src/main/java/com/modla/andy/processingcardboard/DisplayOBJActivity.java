@@ -90,6 +90,7 @@ import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.HeadTransform;
 
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PShape;
 
@@ -158,7 +159,7 @@ public class DisplayOBJActivity extends PApplet {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         // The following call pauses the rendering thread.
         // If your OpenGL application is memory intensive,
@@ -169,7 +170,7 @@ public class DisplayOBJActivity extends PApplet {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         // The following call resumes a paused rendering thread.
         // If you de-allocated graphic objects for onPause()
@@ -179,13 +180,13 @@ public class DisplayOBJActivity extends PApplet {
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
         // TODO release image resources
@@ -198,7 +199,8 @@ public class DisplayOBJActivity extends PApplet {
     float rotx = 0; //PI / 4;
     float roty = 0; //PI / 4;
     PShape rocket;
-
+    PShape textImage;
+    PShape gridImage;
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
@@ -225,7 +227,9 @@ public class DisplayOBJActivity extends PApplet {
     public void setup() {
         background(0);
         rocket = loadShape("obj/rocket.obj");
-
+        textSize(32);
+        textImage = createTextGraphics("ROCKET");
+        gridImage = createGridShape();
         /* second constructor, custom eye separation, custom convergence */
         stereoView(
                 width, height, eyeSeparation, fieldOfViewY,
@@ -244,6 +248,34 @@ public class DisplayOBJActivity extends PApplet {
 
     }
 
+    PShape createTextGraphics(String s) {
+        PGraphics buffer = createGraphics(width/2, height);
+        buffer.beginDraw();
+        buffer.textSize(128);
+        buffer.text(s, width / 8, height / 2 + height / 4);
+        buffer.endDraw();
+
+        PShape face = createShape();
+        face.beginShape(QUAD);
+        face.noStroke();
+        face.textureMode(NORMAL);
+        face.texture(buffer);
+        face.vertex(-1, -1, 0, 0, 0);
+        face.vertex(1, -1, 0, 1, 0);
+        face.vertex(1, 1, 0, 1, 1);
+        face.vertex(-1, 1, 0, 0, 1);
+        face.endShape();
+        return face;
+    }
+
+    void drawTextGraphics(PShape s) {
+        pushMatrix();
+        scale(8);
+        translate(0, 0, -.25f);
+        shape(s);
+        popMatrix();
+    }
+
     void drawShape(PShape s) {
         pushMatrix();
         scale(.01f);
@@ -254,13 +286,53 @@ public class DisplayOBJActivity extends PApplet {
         popMatrix();
     }
 
+    // this test draw only shows up in right viewport
     public void drawText(String s, float x) {
         stroke(255);
         fill(255);
-        scale(.05f);
         pushMatrix();
+        scale(.05f);
         text(s, x, 0, 5);
         popMatrix();
+    }
+
+    public void drawGridShape(PShape grid) {
+        pushMatrix();
+        scale(1f);
+        shape(grid);
+        popMatrix();
+    }
+
+    public PShape createGridShape() {
+        int gridSize = 1;
+        stroke(128);
+        fill(64);
+        PGraphics buffer = createGraphics(width/2, height, P3D);
+        buffer.beginDraw();
+
+        for(int i = -20; i <20; i+=gridSize) {
+            for (int j = -20; j < 20; j +=gridSize) {
+                int y = 1;
+                int z = 0;
+                buffer.line(i, y, j, i + gridSize, y, j);
+                buffer.line(i + gridSize, y, j, i + gridSize, y, j + gridSize);
+                buffer.line(i + gridSize, y, j + gridSize, i, y, j + gridSize);
+                buffer.line(i, y, j, i, y, j + gridSize);
+            }
+        }
+        buffer.endDraw();
+
+        PShape face = createShape();
+        face.beginShape(QUAD);
+        face.noStroke();
+        face.textureMode(NORMAL);
+        face.texture(buffer);
+        face.vertex(-1, -1, 0, 0, 0);
+        face.vertex(1, -1, 0, 1, 0);
+        face.vertex(1, 1, 0, 1, 1);
+        face.vertex(-1, 1, 0, 0, 1);
+        face.endShape();
+        return face;
     }
 
     public void drawGrid() {
@@ -397,8 +469,10 @@ public class DisplayOBJActivity extends PApplet {
     @Override
     public void drawLeft() {
         drawShape(rocket);
-        drawGrid();
-        drawText("ROCKET", 30.0f);
+        //drawGrid();
+        drawGridShape(gridImage);
+        drawTextGraphics(textImage);
+        //drawText("ROCKET", 30.0f);
     }
 
     /**
@@ -407,8 +481,10 @@ public class DisplayOBJActivity extends PApplet {
     @Override
     public void drawRight() {
         drawShape(rocket);
-        drawGrid();
-        drawText("ROCKET", 30.0f);
+        //drawGrid();
+        drawGridShape(gridImage);
+        drawTextGraphics(textImage);
+        //drawText("ROCKET", 30.0f);
     }
 
     /**

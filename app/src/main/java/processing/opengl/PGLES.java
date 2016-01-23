@@ -1,3 +1,27 @@
+/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+
+/*
+  Part of the Processing project - http://processing.org
+
+  Copyright (c) 2012-15 The Processing Foundation
+  Copyright (c) 2004-12 Ben Fry and Casey Reas
+  Copyright (c) 2001-04 Massachusetts Institute of Technology
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation, version 2.1.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+*/
+
 package processing.opengl;
 
 import java.nio.Buffer;
@@ -62,11 +86,12 @@ public class PGLES extends PGL {
   // GLES
 
   static {
+    SINGLE_BUFFERED = true;
+
     MIN_DIRECT_BUFFER_SIZE = 1;
     INDEX_TYPE             = GLES20.GL_UNSIGNED_SHORT;
 
-    SAVE_SURFACE_TO_PIXELS_HACK = false;
-    MIPMAPS_ENABLED     = false;
+    MIPMAPS_ENABLED        = false;
 
     DEFAULT_IN_VERTICES   = 16;
     DEFAULT_IN_EDGES      = 32;
@@ -105,26 +130,20 @@ public class PGLES extends PGL {
 
 
   @Override
-  public GLSurfaceView getCanvas() {
+  public GLSurfaceView getNative() {
     return glview;
   }
 
 
   @Override
-  protected void setFps(float fps) { }
+  protected void setFrameRate(float fps) { }
 
 
   @Override
   protected void initSurface(int antialias) {
-    glview = (GLSurfaceView)pg.parent.getSurfaceView();
+    glview = (GLSurfaceView)sketch.getSurfaceView();
     reqNumSamples = qualityToSamples(antialias);
-
     registerListeners();
-
-    fboLayerCreated = false;
-    fboLayerInUse = false;
-    firstFrame = true;
-    setFps = false;
   }
 
 
@@ -136,15 +155,50 @@ public class PGLES extends PGL {
   protected void registerListeners() { }
 
 
+  @Override
+  protected int getDepthBits()  {
+    intBuffer.rewind();
+    getIntegerv(DEPTH_BITS, intBuffer);
+    return intBuffer.get(0);
+  }
+
+
+  @Override
+  protected int getStencilBits()  {
+    intBuffer.rewind();
+    getIntegerv(STENCIL_BITS, intBuffer);
+    return intBuffer.get(0);
+  }
+
+
+  @Override
+  protected int getDefaultDrawBuffer()  {
+    return fboLayerEnabled ? COLOR_ATTACHMENT0 : FRONT;
+  }
+
+
+  @Override
+  protected int getDefaultReadBuffer()  {
+    return fboLayerEnabled ? COLOR_ATTACHMENT0 : FRONT;
+  }
+
+
   ///////////////////////////////////////////////////////////
 
   // Frame rendering
 
 
   @Override
+  protected float getPixelScale() {
+    return 1;
+  }
+
+
+  @Override
   protected void getGL(PGL pgl) {
     PGLES pgles = (PGLES)pgl;
     this.gl = pgles.gl;
+    setThread(pgles.glThread);
   }
 
 
@@ -160,7 +214,7 @@ public class PGLES extends PGL {
 
   @Override
   protected void requestDraw() {
-    if (pg.initialized && pg.parent.canDraw()) {
+    if (graphics.initialized && sketch.canDraw()) {
       glview.requestRender();
     }
   }
@@ -168,6 +222,31 @@ public class PGLES extends PGL {
 
   @Override
   protected void swapBuffers() { }
+
+
+  @Override
+  protected int getGLSLVersion() {
+    return 100;
+  }
+
+
+  @Override
+  protected void initFBOLayer() {
+    if (0 < sketch.frameCount) {
+      IntBuffer buf = allocateDirectIntBuffer(fboWidth * fboHeight);
+
+      if (hasReadBuffer()) readBuffer(BACK);
+      readPixelsImpl(0, 0, fboWidth, fboHeight, RGBA, UNSIGNED_BYTE, buf);
+      bindTexture(TEXTURE_2D, glColorTex.get(frontTex));
+      texSubImage2D(TEXTURE_2D, 0, 0, 0, fboWidth, fboHeight, RGBA, UNSIGNED_BYTE, buf);
+
+      bindTexture(TEXTURE_2D, glColorTex.get(backTex));
+      texSubImage2D(TEXTURE_2D, 0, 0, 0, fboWidth, fboHeight, RGBA, UNSIGNED_BYTE, buf);
+
+      bindTexture(TEXTURE_2D, 0);
+      bindFramebufferImpl(FRAMEBUFFER, 0);
+    }
+  }
 
 
   ///////////////////////////////////////////////////////////
@@ -215,7 +294,7 @@ public class PGLES extends PGL {
     public void onDrawFrame(GL10 igl) {
       gl = igl;
       glThread = Thread.currentThread();
-      pg.parent.handleDraw(Eye.Type.MONOCULAR);
+      sketch.handleDraw(Eye.Type.MONOCULAR);
     }
 
     public void onSurfaceChanged(GL10 igl, int iwidth, int iheight) {
@@ -224,13 +303,15 @@ public class PGLES extends PGL {
       // Here is where we should initialize native libs...
       // lib.init(iwidth, iheight);
 
-      pg.setSize(iwidth, iheight);
+      graphics.setSize(iwidth, iheight);
     }
 
     public void onSurfaceCreated(GL10 igl, EGLConfig config) {
       gl = igl;
       context = ((EGL10)EGLContext.getEGL()).eglGetCurrentContext();
       glContext = context.hashCode();
+      glThread = Thread.currentThread();
+
 
       if (!hasFBOs()) {
         throw new RuntimeException(MISSING_FBO_ERROR);
@@ -240,7 +321,6 @@ public class PGLES extends PGL {
       }
     }
   }
-
   protected class AndroidCardboardRenderer implements CardboardView.Renderer {
     public AndroidCardboardRenderer() {
     }
@@ -271,13 +351,13 @@ public class PGLES extends PGL {
       int w = eye.getViewport().width;
       int h = eye.getViewport().height;
       //Log.d("PGLES", "viewport "+ x + " "+ y + " "+ w + " " + h);
-      pg.parent.handleDraw(eye.getType());
+      sketch.handleDraw(eye.getType());
     }
 
     @Override
     public void onDrawFrame(HeadTransform headTransform, Eye leftEye, Eye rightEye) {
       glThread = Thread.currentThread();
-      pg.parent.handleHeadTransform(headTransform);
+      sketch.handleHeadTransform(headTransform);
       Viewport vleft = leftEye.getViewport();
       int x = vleft.x;
       int y = vleft.y;
@@ -285,7 +365,7 @@ public class PGLES extends PGL {
       int h = vleft.height;
       //Log.d("PGLES", "onDrawFrame left viewport " + x + " "+ y + " "+ w + " " + h);
 
-      pg.parent.handleDraw(leftEye.getType());
+      sketch.handleDraw(leftEye.getType());
       if (rightEye != null) {
         Viewport vright = rightEye.getViewport();
         x = vright.x;
@@ -293,7 +373,7 @@ public class PGLES extends PGL {
         w = vright.width;
         h = vright.height;
         //Log.d("PGLES", "onDrawFrame right viewport " + x + " "+ y + " "+ w + " " + h);
-        pg.parent.handleDraw(rightEye.getType());
+        sketch.handleDraw(rightEye.getType());
       }
       //Log.d("PGLES", "onDrawFrame");
     }
@@ -311,7 +391,7 @@ public class PGLES extends PGL {
     @Override
     public void onSurfaceChanged(int width, int height) {
       //Log.d("PGLES", "onSurfaceChanged width="+ width + " height="+ height);
-      pg.setSize(width, height);
+      graphics.setSize(width, height);
       GLES20.glViewport(0, 0, width, height);
     }
 
@@ -350,7 +430,7 @@ public class PGLES extends PGL {
     @Override
     public void onNewFrame(HeadTransform headTransform) {
       glThread = Thread.currentThread();
-      pg.parent.handleHeadTransform(headTransform);
+      sketch.handleHeadTransform(headTransform);
 
 //      float[] quat = new float[4];
 //      headTransform.getQuaternion(quat, 0);
@@ -374,7 +454,7 @@ public class PGLES extends PGL {
 //      int w = eye.getViewport().width;
 //      int h = eye.getViewport().height;
 //      Log.d("PGLES", "onDrawEye viewport "+ x + " "+ y + " "+ w + " " + h);
-      pg.parent.handleDraw(eye.getType());
+      sketch.handleDraw(eye.getType());
     }
 
     @Override
@@ -390,7 +470,7 @@ public class PGLES extends PGL {
     @Override
     public void onSurfaceChanged(int width, int height) {
       //Log.d("PGLES", "onSurfaceChanged width="+ width + " height="+ height);
-      pg.setSize(width, height);
+      graphics.setSize(width, height);
       GLES20.glViewport(0, 0, width, height);
     }
 
@@ -413,6 +493,7 @@ public class PGLES extends PGL {
     }
 
   }
+
 
 
   protected class AndroidContextFactory implements
@@ -1066,7 +1147,6 @@ public class PGLES extends PGL {
     STENCIL_TEST    = GLES20.GL_STENCIL_TEST;
     DEPTH_TEST      = GLES20.GL_DEPTH_TEST;
     DEPTH_WRITEMASK = GLES20.GL_DEPTH_WRITEMASK;
-    ALPHA_TEST      = 0x0BC0;
 
     COLOR_BUFFER_BIT   = GLES20.GL_COLOR_BUFFER_BIT;
     DEPTH_BUFFER_BIT   = GLES20.GL_DEPTH_BUFFER_BIT;
@@ -1090,7 +1170,7 @@ public class PGLES extends PGL {
     DEPTH_COMPONENT24 = 0x81A6;
     DEPTH_COMPONENT32 = 0x81A7;
 
-    STENCIL_INDEX  = GLES20.GL_STENCIL_INDEX;
+    STENCIL_INDEX  = 6401; // GLES20.GL_STENCIL_INDEX is marked as deprecated
     STENCIL_INDEX1 = 0x8D46;
     STENCIL_INDEX4 = 0x8D47;
     STENCIL_INDEX8 = GLES20.GL_STENCIL_INDEX8;
@@ -1122,7 +1202,6 @@ public class PGLES extends PGL {
     RENDERBUFFER_INTERNAL_FORMAT = GLES20.GL_RENDERBUFFER_INTERNAL_FORMAT;
 
     MULTISAMPLE    = -1;
-    POINT_SMOOTH   = -1;
     LINE_SMOOTH    = -1;
     POLYGON_SMOOTH = -1;
   }
@@ -1280,13 +1359,15 @@ public class PGLES extends PGL {
 
   @Override
   public void viewport(int x, int y, int w, int h) {
-    GLES20.glViewport(x, y, w, h);
+    float scale = getPixelScale();
+    viewportImpl((int)scale * x, (int)(scale * y), (int)(scale * w), (int)(scale * h));
   }
 
   @Override
-  public void loadIdentity() {
-    // TODO ??
+  protected void viewportImpl(int x, int y, int w, int h) {
+    GLES20.glViewport(x, y, w, h);   // cardboard
   }
+
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -1296,6 +1377,14 @@ public class PGLES extends PGL {
   public void readPixelsImpl(int x, int y, int width, int height, int format, int type, Buffer buffer) {
     GLES20.glReadPixels(x, y, width, height, format, type, buffer);
   }
+
+
+  @Override
+  protected void readPixelsImpl(int x, int y, int width, int height, int format,
+                                int type, long offset) {
+    // TODO Auto-generated method stub
+  }
+
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -1337,18 +1426,13 @@ public class PGLES extends PGL {
   }
 
   @Override
-  public void vertexAttri4fv(int index, FloatBuffer values) {
+  public void vertexAttrib4fv(int index, FloatBuffer values) {
     GLES20.glVertexAttrib4fv(index, values);
   }
 
   @Override
   public void vertexAttribPointer(int index, int size, int type, boolean normalized, int stride, int offset) {
     GLES20.glVertexAttribPointer(index, size, type, normalized, stride, offset);
-  }
-
-  @Override
-  public void vertexAttribPointer(int index, int size, int type, boolean normalized, int stride, Buffer data) {
-    GLES20.glVertexAttribPointer(index, size, type, normalized, stride, data);
   }
 
   @Override
@@ -1362,18 +1446,13 @@ public class PGLES extends PGL {
   }
 
   @Override
-  public void drawArrays(int mode, int first, int count) {
+  public void drawArraysImpl(int mode, int first, int count) {
     GLES20.glDrawArrays(mode, first, count);
   }
 
   @Override
-  public void drawElements(int mode, int count, int type, int offset) {
+  public void drawElementsImpl(int mode, int count, int type, int offset) {
     GLES20.glDrawElements(mode, count, type, offset);
-  }
-
-  @Override
-  public void drawElements(int mode, int count, int type, Buffer indices) {
-    GLES20.glDrawElements(mode, count, type, indices);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -1450,7 +1529,7 @@ public class PGLES extends PGL {
 
   @Override
   public void texParameterf(int target, int pname, float param) {
-    GLES20.glTexParameterf(target, pname, param);
+    GLES20.glTexParameterf(target, pname, param);  // cardboard
   }
 
   @Override
@@ -1841,11 +1920,6 @@ public class PGLES extends PGL {
     GLES20.glBlendColor(red, green, blue, alpha);
   }
 
-  @Override
-  public void alphaFunc(int func, float ref) {
-    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glAlphaFunc()"));
-  }
-
   ///////////////////////////////////////////////////////////
 
   // Whole Framebuffer Operations
@@ -1969,22 +2043,22 @@ public class PGLES extends PGL {
 
   @Override
   public void blitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter) {
-    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glBlitFramebuffer()"));
+//    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glBlitFramebuffer()"));
   }
 
   @Override
   public void renderbufferStorageMultisample(int target, int samples, int format, int width, int height) {
-    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glRenderbufferStorageMultisample()"));
+//    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glRenderbufferStorageMultisample()"));
   }
 
   @Override
   public void readBuffer(int buf) {
-    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glReadBuffer()"));
+//    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glReadBuffer()"));
   }
 
   @Override
   public void drawBuffer(int buf) {
-    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glDrawBuffer()"));
+//    throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "glDrawBuffer()"));
   }
 
 
@@ -2014,4 +2088,38 @@ public class PGLES extends PGL {
     // TODO Auto-generated method stub
     return null;
   }
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Synchronization
+
+  @Override
+  public long fenceSync(int condition, int flags) {
+    return 0;
+//    if (gl3es3 != null) {
+//      return gl3es3.glFenceSync(condition, flags);
+//    } else {
+//      throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "fenceSync()"));
+//    }
+  }
+
+  @Override
+  public void deleteSync(long sync) {
+//    if (gl3es3 != null) {
+//      gl3es3.glDeleteSync(sync);
+//    } else {
+//      throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "deleteSync()"));
+//    }
+  }
+
+  @Override
+  public int clientWaitSync(long sync, int flags, long timeout) {
+    return 0;
+//    if (gl3es3 != null) {
+//      return gl3es3.glClientWaitSync(sync, flags, timeout);
+//    } else {
+//      throw new RuntimeException(String.format(MISSING_GLFUNC_ERROR, "clientWaitSync()"));
+//    }
+  }
+
 }

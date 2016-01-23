@@ -1,12 +1,15 @@
+/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2011-12 Ben Fry and Casey Reas
+  Copyright (c) 2012-15 The Processing Foundation
+  Copyright (c) 2004-12 Ben Fry and Casey Reas
+  Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+  License as published by the Free Software Foundation, version 2.1.
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,6 +27,7 @@ package processing.opengl;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
+import processing.opengl.PGraphicsOpenGL.GLResourceTexture;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -84,6 +88,7 @@ public class Texture implements PConstants {
   public int glWrapT;
   public int glWidth;
   public int glHeight;
+  private GLResourceTexture glres;
 
   protected PGraphicsOpenGL pg;
   protected PGL pgl;                // The interface between Processing and OpenGL.
@@ -167,18 +172,6 @@ public class Texture implements PConstants {
   }
 
 
-  @Override
-  protected void finalize() throws Throwable {
-    try {
-      if (glName != 0) {
-        PGraphicsOpenGL.finalizeTextureObject(glName, context);
-      }
-    } finally {
-      super.finalize();
-    }
-  }
-
-
   ////////////////////////////////////////////////////////////
 
   // Init, resize methods
@@ -253,8 +246,7 @@ public class Texture implements PConstants {
 
 
   public void resize(int wide, int high) {
-    // Marking the texture object as finalized so it is deleted
-    // when creating the new texture.
+    // Disposing current resources.
     dispose();
 
     // Creating new texture with the appropriate size.
@@ -1148,7 +1140,7 @@ public class Texture implements PConstants {
     }
 
     context = pgl.getCurrentContext();
-    glName = PGraphicsOpenGL.createTextureObject(context, pgl);
+    glres = new GLResourceTexture(this);
 
     pgl.bindTexture(glTarget, glName);
     pgl.texParameteri(glTarget, PGL.TEXTURE_MIN_FILTER, glMinFilter);
@@ -1182,8 +1174,9 @@ public class Texture implements PConstants {
    * Marks the texture object for deletion.
    */
   protected void dispose() {
-    if (glName != 0) {
-      PGraphicsOpenGL.finalizeTextureObject(glName, context);
+    if (glres != null) {
+      glres.dispose();
+      glres = null;
       glName = 0;
     }
   }
@@ -1192,14 +1185,7 @@ public class Texture implements PConstants {
   protected boolean contextIsOutdated() {
     boolean outdated = !pgl.contextIsCurrent(context);
     if (outdated) {
-      // Removing the texture object from the renderer's list so it
-      // doesn't get deleted by OpenGL. The texture object was
-      // automatically disposed when the old context was destroyed.
-      PGraphicsOpenGL.removeTextureObject(glName, context);
-
-      // And then set the id to zero, so it doesn't try to be
-      // deleted when the object's finalizer is invoked by the GC.
-      glName = 0;
+      dispose();
     }
     return outdated;
   }
@@ -1246,7 +1232,7 @@ public class Texture implements PConstants {
       // Rendering tex into "this", and scaling the source rectangle
       // to cover the entire destination region.
       pgl.drawTexture(tex.glTarget, tex.glName, tex.glWidth, tex.glHeight,
-                      0, 0, tempFbo.width, tempFbo.height,
+                      0, 0, tempFbo.width, tempFbo.height, 1,
                       x, y, x + w, y + h, 0, 0, width, height);
 
     } else {
@@ -1254,7 +1240,7 @@ public class Texture implements PConstants {
       // of the source texture fall in the corresponding texels of the
       // destination.
       pgl.drawTexture(tex.glTarget, tex.glName, tex.glWidth, tex.glHeight,
-                      0, 0, tempFbo.width, tempFbo.height,
+                      0, 0, tempFbo.width, tempFbo.height, 1,
                       x, y, x + w, y + h, x, y, x + w, y + h);
     }
     pg.popFramebuffer();

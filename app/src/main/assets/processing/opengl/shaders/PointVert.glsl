@@ -1,11 +1,13 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2011-13 Ben Fry and Casey Reas
+  Copyright (c) 2012-15 The Processing Foundation
+  Copyright (c) 2004-12 Ben Fry and Casey Reas
+  Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
-  License version 2.1 as published by the Free Software Foundation.
+  License as published by the Free Software Foundation, version 2.1.
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +18,7 @@
   Public License along with this library; if not, write to the
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
- */
-
-#define PROCESSING_POINT_SHADER
+*/
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelviewMatrix;
@@ -47,8 +47,8 @@ void main() {
     gl_Position = clip + projectionMatrix * vec4(offset.xy, 0, 0);
   } else {
     // No perspective correction.	
-    vec4 offset = windowToClipVector(offset.xy, viewport, clip.w);
-    gl_Position = clip + offset;
+    vec4 cloff = windowToClipVector(offset.xy, viewport, clip.w);
+    gl_Position = clip + cloff;
   }
   
   vertColor = color;

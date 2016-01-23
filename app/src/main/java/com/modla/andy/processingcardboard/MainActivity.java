@@ -33,24 +33,25 @@ package com.modla.andy.processingcardboard;
  * Using Processing with Cardboard SDK is an alternative for writing Android VR applications.
  *
  * <p/>
- * Requires Android Studio (1.2.2)
+ * Uses Android Studio (1.5.1)
  * <p/>
- * Cardboard SDK for Android 0.5.5
+ * Cardboard SDK for Android 0.6.0
  * <p/>
  * Minimum Android API 4.1 (16)
  * <p/>
  * Tested with Sony Z1S phone, 1920x1080 pixel display, running Android version 5.0.2, and
  * hardware accelerated GPU
+ * Tested with Samsung S6 phone
  *
  * <p/>
  * Issues:
- * Distortion correction is disabled because the Cardboard correction feature does not work well
+ * Distortion correction is disabled because the Cardboard correction feature does not work well.
  * The display is not distorted enough to matter with my Unofficial cardboard viewer lens and
  * home made viewer with stereoscopic quality lens.
  * <p/>
  * Out of memory can occur when using large images and restarting the app
  * <p/>
- * Processing-Cardboard Library build for Processing 2.2.1 IDE not implemented. Here the library
+ * Processing-Cardboard Library build for Processing 3.0 IDE not implemented. Here the library
  * is included with the app as Processing source code.
  * <p/>
  *
@@ -163,7 +164,7 @@ public class MainActivity extends PApplet {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         // The following call pauses the rendering thread.
         // If your OpenGL application is memory intensive,
@@ -174,7 +175,7 @@ public class MainActivity extends PApplet {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         // The following call resumes a paused rendering thread.
         // If you de-allocated graphic objects for onPause()
@@ -184,13 +185,13 @@ public class MainActivity extends PApplet {
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
         // TODO release image resources
