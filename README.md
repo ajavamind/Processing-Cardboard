@@ -14,7 +14,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
  * Works with Android Studio (1.5.1)
  * Cardboard SDK for Android 0.6.0
- * Based on Processing for Android library version 3 with Processing core source code from: https://github.com/processing/processing-android.
+ * Based on Processing for Android library version 3 (as of 2015/12/08) with Processing core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
  
  * Minimum builds supports Android API 4.1 (16) platform and above
@@ -58,7 +58,7 @@ Distortion correction is disabled because the Cardboard correction feature does 
  * Added PStereo class for stereo view control
   
  * Added headtransform, drawleft, drawright functions to Processing
- * 
+  
  * Added external keyboard codes for remote Bluetooth controller key press.
  
 
