@@ -14,7 +14,8 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
  * Works with Android Studio (1.5.1)
  * Cardboard SDK for Android 0.6.0
- * Based on Processing for Android library version 3 (as of 2015/12/08) with Processing core source code from: https://github.com/processing/processing-android.
+ * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
+   with Processing core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
  
  * Minimum builds supports Android API 4.1 (16) platform and above
@@ -27,7 +28,7 @@ The app displays a stereo photo cube in front of a stereo photo background. In t
  
  * Issues:
  
-Distortion correction is disabled because the Cardboard correction feature does not work well.
+Distortion correction can be enabled, but the eye separation needs adjustment for viewing.
  The display is not distorted enough to matter with some Unofficial cardboard viewer lens and
  home made Cardboard viewer with stereoscopic quality lens.
  
