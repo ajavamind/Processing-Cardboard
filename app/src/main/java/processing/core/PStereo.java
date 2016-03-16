@@ -1,8 +1,9 @@
 package processing.core;
 
-import processing.core.PApplet;
-import processing.core.PVector;
-import processing.opengl.*;
+import com.google.vrtoolkit.cardboard.Eye;
+import com.google.vrtoolkit.cardboard.Viewport;
+
+import processing.opengl.PGL;
 
 /**
  * processing.core.PStereo derived from repository:
@@ -181,6 +182,57 @@ public class PStereo {
                 upx, upy, upz
         );
     }
+
+    public void rightEye(Eye eye) {
+        // Adjusts viewport based on stereo type
+        if(this.stereoType == StereoType.SIDE_BY_SIDE) {
+            Viewport vp = eye.getViewport();
+            aspectRatio = ((float)vp.width)/((float) vp.height);
+            pgl.viewport(vp.x, vp.y, vp.width, vp.height);
+        } else {
+            pgl.viewport(0, 0, this.width, this.height);
+        }
+
+        // Set frustum
+        float top = widthdiv2;
+        float bottom = -widthdiv2;
+        float left = (-aspectRatio * widthdiv2 - 0.5f * eyeSeparation * nearPlane / convPlane);
+        float right = (aspectRatio * widthdiv2 - 0.5f * eyeSeparation * nearPlane / convPlane);
+        app.frustum(left, right, bottom, top, nearPlane, farPlane);
+
+        // Set camera
+        app.camera(
+                posx + rightx, posy + righty, posz + rightz,
+                posx + rightx + dirx, posy + righty + diry, posz + rightz + dirz,
+                upx, upy, upz
+        );
+    }
+
+    /**
+     * Set the left eye view
+     */
+    public void leftEye(Eye eye) {
+        // Adjusts viewport based on stereo type
+        if(this.stereoType == StereoType.SIDE_BY_SIDE) {
+            Viewport vp = eye.getViewport();
+            aspectRatio = ((float)vp.width)/((float) vp.height);
+            pgl.viewport(vp.x, vp.y, vp.width, vp.height);
+        } else {
+            pgl.viewport(0, 0, this.width, this.height);
+        }
+
+        // Set frustum
+        float top = widthdiv2;
+        float bottom = -widthdiv2;
+        float left = (-aspectRatio * widthdiv2 + 0.5f * eyeSeparation * nearPlane / convPlane);
+        float right = (aspectRatio * widthdiv2 + 0.5f * eyeSeparation * nearPlane / convPlane);
+        app.frustum(left, right, bottom, top, nearPlane, farPlane);
+
+        // Set camera
+        app.camera(
+                posx - rightx, posy - righty, posz - rightz,
+                posx - rightx + dirx, posy - righty + diry, posz - rightz + dirz,
+                upx, upy, upz
+        );
+    }
 }
-
-

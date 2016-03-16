@@ -23,6 +23,42 @@
 
 package processing.core;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -52,48 +88,9 @@ import com.google.vrtoolkit.cardboard.CardboardActivity;
 import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.Eye;
 import com.google.vrtoolkit.cardboard.HeadTransform;
-import com.google.vrtoolkit.cardboard.Viewport;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpEntity;
-
+import processing.data.JSONArray;
+import processing.data.JSONObject;
 import processing.data.StringList;
 import processing.data.Table;
 import processing.data.XML;
@@ -107,9 +104,8 @@ import processing.opengl.PGraphics3D;
 import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PShader;
 
-
 public class PApplet extends CardboardActivity
-        implements PConstants, Runnable {
+        implements PConstants {
     private static String TAG = "PApplet";
 
     /**
@@ -129,6 +125,8 @@ public class PApplet extends CardboardActivity
 
     //  static final public boolean DEBUG = true;
     static final public boolean DEBUG = false;
+
+    public volatile boolean doExit = false;
 
     /** The frame containing this applet (if any) */
 //  public Frame frame;
@@ -318,7 +316,7 @@ public class PApplet extends CardboardActivity
     /**
      * Post events to the main thread that created the Activity
      */
-    Handler handler;
+    //Handler handler;
 
     /**
      * Last key pressed.
@@ -419,7 +417,8 @@ public class PApplet extends CardboardActivity
      */
     protected boolean paused;
 
-    protected SurfaceView surfaceView;
+    protected GLSurfaceView surfaceView;
+
 
     /**
      * The Window object for Android.
@@ -432,7 +431,7 @@ public class PApplet extends CardboardActivity
      */
     protected boolean exitCalled;
 
-    Thread thread;
+    public Thread thread;
 
     // messages to send if attached as an external vm
 
@@ -501,6 +500,7 @@ public class PApplet extends CardboardActivity
 
     String renderer = JAVA2D;
 
+
     int smooth = 1;  // default smoothing (whatever that means for the renderer)
 
     boolean fullScreen = false;
@@ -520,6 +520,13 @@ public class PApplet extends CardboardActivity
      */
     public PApplet() {
         activity = this;
+    }
+
+    public boolean isExiting() {
+        if (doExit) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -547,15 +554,16 @@ public class PApplet extends CardboardActivity
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         displayWidth = dm.widthPixels;
         displayHeight = dm.heightPixels;
 
+
         //Setting the default height and width to be fullscreen
         width = displayWidth;
         height = displayHeight;
+
 //    println("density is " + dm.density);
 //    println("densityDpi is " + dm.densityDpi);
         if (DEBUG) println("display metrics: " + dm);
@@ -626,6 +634,7 @@ public class PApplet extends CardboardActivity
     */
 
 
+
         finished = false; // just for clarity
 
         // this will be cleared by draw() if it is not overridden
@@ -637,13 +646,15 @@ public class PApplet extends CardboardActivity
         sketchPath = context.getFilesDir().getAbsolutePath();
 
 //    Looper.prepare();
-        handler = new Handler();
+//        handler = new Handler();
 //    println("calling loop()");
 //    Looper.loop();
 //    println("done with loop() call, will continue...");
 
         // start();// by not calling start, we use cardboard main thread loop instead of Processing draw thread
-    }
+    }  // onCreate()
+
+
 
 //  /** Called with the activity is first created. */
 //  @SuppressWarnings("unchecked")
@@ -840,13 +851,12 @@ public class PApplet extends CardboardActivity
         super.onResume();
 
         // TODO need to bring back app state here!
-//    surfaceView.onResume();
+
         if (DEBUG) System.out.println("PApplet.onResume() called");
         paused = false;
         handleMethods("resume");
         //start();  // kick the thread back on
         resume();
-//    surfaceView.onResume();
     }
 
     @Override
@@ -858,10 +868,6 @@ public class PApplet extends CardboardActivity
         paused = true;
         handleMethods("pause");
         pause();  // handler for others to write
-//  synchronized (this) {
-//  paused = true;
-//}
-//    surfaceView.onPause();
     }
 
 
@@ -934,13 +940,12 @@ public class PApplet extends CardboardActivity
 
     @Override
     public void onDestroy() {
-//    stop();
         dispose();
+
         if (PApplet.DEBUG) {
             System.out.println("PApplet.onDestroy() called");
         }
         super.onDestroy();
-        //finish();
     }
 
 
@@ -1206,9 +1211,10 @@ public class PApplet extends CardboardActivity
                 setEGLConfigChooser(((PGLES) g3.pgl).getConfigChooser(quality));
             }
 
-            // The renderer can be set only once.
-            setRenderer(((PGLES) g3.pgl).getCardboardRenderer());
-            //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            // The renderer can be set only once, decide now.
+            //setRenderer(((PGLES) g3.pgl).getCardboardRenderer());
+            setRenderer(((PGLES) g3.pgl).getCardboardStereoRenderer());  // use with distortion correction enabled
+            //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY); // DO NOT use with cardboard
             setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
             // assign this g to the PApplet
@@ -1242,6 +1248,7 @@ public class PApplet extends CardboardActivity
             if (DEBUG) {
                 System.out.println("surfaceDestroyed()");
             }
+
 
       /*
       // TODO: Check how to make sure of calling g3.dispose() when this call to
@@ -1427,15 +1434,16 @@ public class PApplet extends CardboardActivity
      * Called explicitly via the first call to PApplet.paint(), because
      * PAppletGL needs to have a usable screen before getting things rolling.
      */
-    public void start() {
-        finished = false;
-        paused = false; // unpause the thread
+//    public void start() {
+//        finished = false;
+//        paused = false; // unpause the thread
 
-        if (thread == null) {
-            thread = new Thread(this, "Animation Thread");
-            thread.start();
-        }
-    }
+//        if (thread == null) {
+//            thread = new Thread(this, "Animation Thread");
+//            thread.start();
+//        }
+
+//    }
 
 
     /**
@@ -2407,6 +2415,63 @@ public class PApplet extends CardboardActivity
         }
     }
 
+    public void handleDraw(Eye eye) {
+        if (DEBUG) {
+            Log.d(TAG, "inside handleDraw() " + millis() +
+                    " changed=" + surfaceChanged +
+                    " ready=" + surfaceReady +
+                    " paused=" + paused +
+                    " looping=" + looping +
+                    " redraw=" + redraw);
+        }
+        if (eye.getType() == Eye.Type.LEFT || eye.getType() == Eye.Type.MONOCULAR) {
+            if (surfaceChanged) {
+                int newWidth = surfaceView.getWidth();
+                int newHeight = surfaceView.getHeight();
+                if (newWidth != width || newHeight != height) {
+                    width = newWidth;
+                    height = newHeight;
+                    displayWidth = newWidth;
+                    displayHeight = newHeight;
+                    g.setSize(width, height);
+                }
+                surfaceChanged = false;
+                surfaceReady = true;
+                if (DEBUG) {
+                    Log.d(TAG, "surfaceChanged true, resized to " + width + "x" + height);
+                }
+            }
+        }
+
+//    if (surfaceView.isShown()) {
+//      println("surface view not visible, getting out");
+//      return;
+//    } else {
+//      println("surface set to go.");
+//    }
+
+        // don't start drawing (e.g. don't call setup) until there's a legitimate
+        // width and height that have been set by surfaceChanged().
+//    boolean validSize = width != 0 && height != 0;
+//    println("valid size = " + validSize + " (" + width + "x" + height + ")");
+        if (canDraw()) {
+//      if (!g.canDraw()) {
+//        // Don't draw if the renderer is not yet ready.
+//        // (e.g. OpenGL has to wait for a peer to be on screen)
+//        return;
+//      }
+
+            //Log.d("PGLES", "framecount="+ frameCount);
+            if (eye.getType() == Eye.Type.LEFT) {
+                leftDraw(eye);
+            } else if (eye.getType() == Eye.Type.RIGHT) {
+                rightDraw(eye);
+            } else {
+                monocularDraw();
+            }
+        }
+    }
+
     void leftDraw(boolean monocular) {
         g.beginDraw();
 
@@ -2424,7 +2489,7 @@ public class PApplet extends CardboardActivity
             }
             // onResume needed because cardboard rendering thread pauses depending on first frame
             // even though mode is GLSurfaceView.RENDERMODE_CONTINUOUSLY
-            getCardboardView().onResume();
+            //getCardboardView().onResume();
 
             return;
 //        this.defaultSize = false;
@@ -2461,12 +2526,97 @@ public class PApplet extends CardboardActivity
         if (frameCount == 0) {
             g.endDraw();
         } else if (!monocular) {
-            //g.endDraw();
-            //g.beginDraw();
-            //pushMatrix();
             pStereo.right();
             drawRight();
-            //popMatrix();
+        }
+        if (frameCount > 0) {
+            // dmouseX/Y is updated only once per frame (unlike emouseX/Y)
+            dmouseX = mouseX;
+            dmouseY = mouseY;
+//        dmotionX = motionX;
+//        dmotionY = motionY;
+
+            // these are called *after* loop so that valid
+            // drawing commands can be run inside them. it can't
+            // be before, since a call to background() would wipe
+            // out anything that had been drawn so far.
+//        dequeueMotionEvents();
+//        dequeueKeyEvents();
+            dequeueEvents();
+
+            handleMethods("draw");
+
+            redraw = false;  // unset 'redraw' flag in case it was set
+            // (only do this once draw() has run, not just setup())
+            g.endDraw();
+        }
+        if (frameCount != 0) {
+            handleMethods("post");
+        }
+
+        frameRateLastNanos = now;
+        frameCount++;
+    }
+
+    void leftDraw(Eye eye) {
+        boolean monocular = eye.getType()==Eye.Type.MONOCULAR;
+        g.beginDraw();
+
+        long now = System.nanoTime();
+
+        if (frameCount == 0) {
+            try {
+                //println("Calling setup()");
+                setup();
+
+                //println("Done with setup()");
+
+            } catch (RendererChangeException e) {
+                // Give up, instead set the new renderer and re-attempt setup()
+                return;
+            }
+            // onResume needed because cardboard rendering thread pauses depending on first frame
+            // even though mode is GLSurfaceView.RENDERMODE_CONTINUOUSLY
+            //getCardboardView().onResume();
+
+            return;
+//        this.defaultSize = false;
+
+        } else {  // frameCount > 0, meaning an actual draw()
+            // update the current frameRate
+            double rate = 1000000.0 / ((now - frameRateLastNanos) / 1000000.0);
+            float instantaneousRate = (float) rate / 1000.0f;
+            frameRate = (frameRate * 0.9f) + (instantaneousRate * 0.1f);
+
+            if (frameCount != 0) {
+                handleMethods("pre");
+            }
+
+            // use dmouseX/Y as previous mouse pos, since this is the
+            // last position the mouse was in during the previous draw.
+            pmouseX = dmouseX;
+            pmouseY = dmouseY;
+//        pmotionX = dmotionX;
+//        pmotionY = dmotionY;
+
+            //println("Calling draw()");
+            if (monocular) {
+                draw();
+            } else {
+                draw();
+                pStereo.leftEye(eye);
+                drawLeft();
+            }
+        }
+    }
+
+    void rightDraw(Eye eye) {
+        boolean monocular = eye.getType()==Eye.Type.MONOCULAR;
+        if (frameCount == 0) {
+            g.endDraw();
+        } else if (!monocular) {
+            pStereo.rightEye(eye);
+            drawRight();
         }
         if (frameCount > 0) {
             // dmouseX/Y is updated only once per frame (unlike emouseX/Y)
@@ -3625,6 +3775,7 @@ public class PApplet extends CardboardActivity
         // moved here from stop()
         finished = true;  // let the sketch know it is shut down time
 
+
         // don't run stop and disposers twice
         if (thread == null) return;
         thread = null;
@@ -3632,7 +3783,13 @@ public class PApplet extends CardboardActivity
         // call to shut down renderer, in case it needs it (pdf does)
         if (g != null) g.dispose();
 
+
+
+
+
         handleMethods("dispose");
+
+
     }
 
 
@@ -3879,6 +4036,25 @@ public class PApplet extends CardboardActivity
         System.out.flush();
     }
 
+  /**
+   * @param variables list of data, separated by commas
+   */
+  static public void print(Object... variables) {
+    StringBuilder sb = new StringBuilder();
+    for (Object o : variables) {
+      if (sb.length() != 0) {
+        sb.append(" ");
+      }
+      if (o == null) {
+        sb.append("null");
+      } else {
+        sb.append(o.toString());
+      }
+    }
+    System.out.print(sb.toString());
+  }
+
+  /*
     static public void print(Object what) {
         if (what == null) {
             // special case since this does fuggly things on > 1.1
@@ -3887,6 +4063,7 @@ public class PApplet extends CardboardActivity
             System.out.println(what.toString());
         }
     }
+  */
 
     //
 
@@ -3925,6 +4102,15 @@ public class PApplet extends CardboardActivity
         print(what);
         System.out.println();
     }
+
+  /**
+   * @param variables list of data, separated by commas
+   */
+  static public void println(Object... variables) {
+//    System.out.println("got " + variables.length + " variables");
+    print(variables);
+    println();
+  }
 
     static public void println(Object what) {
         if (what == null) {
@@ -4854,6 +5040,105 @@ public class PApplet extends CardboardActivity
     public boolean saveXML(XML xml, String filename, String options) {
         return xml.save(saveFile(filename), options);
     }
+
+
+  /**
+   * @webref input:files
+   * @param input String to parse as a JSONObject
+   * @see PApplet#loadJSONObject(String)
+   * @see PApplet#saveJSONObject(JSONObject, String)
+   */
+  public JSONObject parseJSONObject(String input) {
+    return new JSONObject(new StringReader(input));
+  }
+
+
+  /**
+   * @webref input:files
+   * @param filename name of a file in the data folder or a URL
+   * @see JSONObject
+   * @see JSONArray
+   * @see PApplet#loadJSONArray(String)
+   * @see PApplet#saveJSONObject(JSONObject, String)
+   * @see PApplet#saveJSONArray(JSONArray, String)
+   */
+  public JSONObject loadJSONObject(String filename) {
+    return new JSONObject(createReader(filename));
+  }
+
+
+  static public JSONObject loadJSONObject(File file) {
+    return new JSONObject(createReader(file));
+  }
+
+
+  /**
+   * @webref output:files
+   * @see JSONObject
+   * @see JSONArray
+   * @see PApplet#loadJSONObject(String)
+   * @see PApplet#loadJSONArray(String)
+   * @see PApplet#saveJSONArray(JSONArray, String)
+   */
+  public boolean saveJSONObject(JSONObject json, String filename) {
+    return saveJSONObject(json, filename, null);
+  }
+
+
+  /**
+   * @nowebref
+   */
+  public boolean saveJSONObject(JSONObject json, String filename, String options) {
+    return json.save(saveFile(filename), options);
+  }
+
+  
+  /**
+   * @webref input:files
+   * @param input String to parse as a JSONArray
+   * @see JSONObject
+   * @see PApplet#loadJSONObject(String)
+   * @see PApplet#saveJSONObject(JSONObject, String)
+   */
+  public JSONArray parseJSONArray(String input) {
+    return new JSONArray(new StringReader(input));
+  }
+
+
+  /**
+   * @webref input:files
+   * @param filename name of a file in the data folder or a URL
+   * @see JSONArray
+   * @see PApplet#loadJSONObject(String)
+   * @see PApplet#saveJSONObject(JSONObject, String)
+   * @see PApplet#saveJSONArray(JSONArray, String)
+   */
+  public JSONArray loadJSONArray(String filename) {
+    return new JSONArray(createReader(filename));
+  }
+
+
+  static public JSONArray loadJSONArray(File file) {
+    return new JSONArray(createReader(file));
+  }
+
+
+  /**
+   * @webref output:files
+   * @see JSONObject
+   * @see JSONArray
+   * @see PApplet#loadJSONObject(String)
+   * @see PApplet#loadJSONArray(String)
+   * @see PApplet#saveJSONObject(JSONObject, String)
+   */
+  public boolean saveJSONArray(JSONArray json, String filename) {
+    return saveJSONArray(json, filename, null);
+  }
+
+
+  public boolean saveJSONArray(JSONArray json, String filename, String options) {
+    return json.save(saveFile(filename), options);
+  }
 
 
     public Table createTable() {
@@ -8389,6 +8674,8 @@ public class PApplet extends CardboardActivity
     public void onStart() {
         tellPDE("onStart");
         super.onStart();
+        finished = false;
+        paused = false; // unpause the thread
     }
 
 

@@ -240,10 +240,10 @@ public class DisplayOBJActivity extends PApplet {
         //println("Screen Width="+ width + " Height="+height);
         // stereoPosition only needs to be called repeatedly if you are
         // changing camera position, which we are doing
-        stereoPosition(
-                cameraPositionX, cameraPositionY, cameraPositionZ,
-                0f, 0f, -1f,  // directionX, directionY, directionZ
-                0f, 1f, 0f);  // upX, upY, upZ
+//        stereoPosition(
+//                cameraPositionX, cameraPositionY, cameraPositionZ,
+//                0f, 0f, -1f,  // directionX, directionY, directionZ
+//                0f, 1f, 0f);  // upX, upY, upZ
         cardboardView.resetHeadTracker();
 
     }
@@ -270,7 +270,7 @@ public class DisplayOBJActivity extends PApplet {
 
     void drawTextGraphics(PShape s) {
         pushMatrix();
-        scale(8);
+        scale(4f);
         translate(0, 0, -.25f);
         shape(s);
         popMatrix();
@@ -288,17 +288,17 @@ public class DisplayOBJActivity extends PApplet {
 
     // this test draw only shows up in right viewport
     public void drawText(String s, float x) {
+        pushMatrix();
         stroke(255);
         fill(255);
-        pushMatrix();
-        scale(.05f);
-        text(s, x, 0, 5);
+        scale(2f);
+        text(s, x, 0.0f, 0f);
         popMatrix();
     }
 
     public void drawGridShape(PShape grid) {
         pushMatrix();
-        scale(1f);
+        scale(4f);
         shape(grid);
         popMatrix();
     }
@@ -307,18 +307,23 @@ public class DisplayOBJActivity extends PApplet {
         int gridSize = 1;
         stroke(128);
         fill(64);
+        println("width=" + width + " height="+height);
         PGraphics buffer = createGraphics(width/2, height, P3D);
         buffer.beginDraw();
 
         for(int i = -20; i <20; i+=gridSize) {
-            for (int j = -20; j < 20; j +=gridSize) {
+            //for (int j = -20; j < 20; j +=gridSize) {
                 int y = 1;
                 int z = 0;
-                buffer.line(i, y, j, i + gridSize, y, j);
-                buffer.line(i + gridSize, y, j, i + gridSize, y, j + gridSize);
-                buffer.line(i + gridSize, y, j + gridSize, i, y, j + gridSize);
-                buffer.line(i, y, j, i, y, j + gridSize);
-            }
+//            buffer.line(i, y, j, i + gridSize, y, j);
+//            buffer.line(i + gridSize, y, j, i + gridSize, y, j + gridSize);
+//            buffer.line(i + gridSize, y, j + gridSize, i, y, j + gridSize);
+//            buffer.line(i, y, j, i, y, j + gridSize);
+            buffer.line(i, y,  i + gridSize, y);
+            buffer.line(i + gridSize, y,  i + gridSize, y );
+            buffer.line(i + gridSize, y,  i, y);
+            buffer.line(i, y,  i, y);
+            //}
         }
         buffer.endDraw();
 
@@ -337,9 +342,9 @@ public class DisplayOBJActivity extends PApplet {
 
     public void drawGrid() {
         int gridSize = 1;
+        pushMatrix();
         stroke(128);
         fill(64);
-        pushMatrix();
         for(int i = -20; i <20; i+=gridSize) {
             for(int j = -20; j < 20; j+=gridSize) {
                 int y = 1;
@@ -468,11 +473,11 @@ public class DisplayOBJActivity extends PApplet {
      */
     @Override
     public void drawLeft() {
+        //drawGridShape(gridImage);
         drawShape(rocket);
         //drawGrid();
-        drawGridShape(gridImage);
         drawTextGraphics(textImage);
-        //drawText("ROCKET", 30.0f);
+        drawText("Spaceship", 30.0f);
     }
 
     /**
@@ -480,11 +485,11 @@ public class DisplayOBJActivity extends PApplet {
      */
     @Override
     public void drawRight() {
+        //drawGridShape(gridImage);
         drawShape(rocket);
         //drawGrid();
-        drawGridShape(gridImage);
         drawTextGraphics(textImage);
-        //drawText("ROCKET", 30.0f);
+        drawText("Spaceship", 30.0f);
     }
 
     /**
