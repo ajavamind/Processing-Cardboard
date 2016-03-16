@@ -29,12 +29,11 @@ The app displays a stereo photo cube in front of a stereo photo background. In t
  * Issues:
  
 Distortion correction can be enabled, but the eye separation needs adjustment for viewing.
- The display is not distorted enough to matter with some Unofficial cardboard viewer lens and
- home made Cardboard viewer with stereoscopic quality lens.
- 
- Out of memory can result when using large images or restarting the app.
- 
- No library build was defined here to make a Processing Android SDK library 
+ -The display is not distorted enough to matter with some Unofficial cardboard viewer lens and
+   home made Cardboard viewer with stereoscopic quality lens.
+ -Text and line drawing do not work on screen directly, Need to use PShape and texture.
+ -Out of memory can result when using large images or restarting the app.
+ -No library build was defined here to make a Processing Android SDK library
  
  Notes:
  The magnet trigger does not work well with my phone so I use new convert tap to trigger feature
