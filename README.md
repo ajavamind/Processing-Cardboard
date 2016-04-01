@@ -12,10 +12,16 @@ With this code you can write Processing sketches for Android apps to use stereo 
  Processing with Cardboard SDK is an alternative for writing Android VR applications. 
  It is another way to build/explore/learn the Cardboard VR app development platform.
  
+ 
+![Transion Screenshot](Screenshot_2016-04-01-15-43-29.png)
+
+![DisplayOBJ Screenshot](Screenshot_2016-04-01-15-43-49.png)
+
+ 
 ## Implementation
  
  * Works with Android Studio (1.5.1)
- * Cardboard SDK libraries for Android 0.7.0 (aar files included in the libs folder, replacing carddboard.jar and audio.jar)
+ * Cardboard SDK libraries for Android 0.7.0 (aar files included in the libs folder, replacing cardboard.jar and audio.jar)
  * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
    with Processing-Android core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
