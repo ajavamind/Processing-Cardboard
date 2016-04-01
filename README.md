@@ -15,11 +15,11 @@ With this code you can write Processing sketches for Android apps to use stereo 
 ## Implementation
  
  * Works with Android Studio (1.5.1)
- * Cardboard SDK for Android 0.6.0 (included in the libs folder)
+ * Cardboard SDK libraries for Android 0.7.0 (aar files included in the libs folder, replacing carddboard.jar and audio.jar)
  * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
    with Processing-Android core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
- * Minimum builds supports Android API 4.1 (16) platform and above
+ * Minimum builds supports Android API 4.1 (16) platform and above. However, AndroidManifest.xml is set for Kitkat 4.4 (19)
  * Tested with Sony Z1S phone, 1920 x 1080 pixel display, running Android version 5.0.2, with GPU hardware accelerator
  * Tested with Samsung Galaxy S6 phone, 2560 x 1440 pixel display, running Android version 5.1.1
  
@@ -71,23 +71,33 @@ A screen tap will bring the cube back to its original location.
 Tilting the HMD viewer left or right will change the cube size.
 The app examples also show how to display text and graphics (reticle).
 
+No distortion correction:
 
 ![Screenshot](Screenshot_2016-01-24-10-35-00.png)
 
- 
+Distortion correction enabled:
+
+![Screenshot](Screenshot_2016-03-31-16-05-40.png)
+
 ## Issues:
  
+  1. Out of memory can result when using large images or restarting the app.
+ 
+## Updates:
+ 
+### 2016/04/01
+
   1. Distortion correction can be enabled, but the eye separation may need adjustment for viewing.
   The display may not be distorted enough to matter with some Unofficial cardboard viewer lens and
    home made Cardboard viewer with stereoscopic quality wide field of view lens.
-  2. Text and line drawing do not work on screen directly, or appear in wrong eye viewport. Text display needs to use PShape and texture.
-  3. Out of memory can result when using large images or restarting the app.
- 
+  2. Text and line drawing now work on screen directly in the correct eye viewport.
+  3. Modifications to use Cardboard libraries version 0.7.0.
+  
 ## Notes:
  The magnet pull trigger does not work well with my phone so I use new convert tap to trigger feature
  available in Cardboard V2.
  
- No library build was defined here to make a Processing Android SDK library.
+ No library build was defined here to make a Processing Android SDK library for use with a desktop computer.
  
  Recommend Android 4.4 for faster image/photo processing and display
 

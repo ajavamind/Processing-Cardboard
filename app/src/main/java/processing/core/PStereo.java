@@ -235,4 +235,17 @@ public class PStereo {
                 upx, upy, upz
         );
     }
+    /**
+     * Set the left eye viewport  (experimental)
+     */
+    public void leftEyeViewport(Eye eye) {
+        // Adjusts viewport based on stereo type
+        if(this.stereoType == StereoType.SIDE_BY_SIDE) {
+            Viewport vp = eye.getViewport();
+            pgl.viewport(vp.x, vp.y, vp.width, vp.height);
+        } else {
+            pgl.viewport(0, 0, this.width, this.height);
+        }
+
+    }
 }

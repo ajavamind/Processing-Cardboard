@@ -28,55 +28,6 @@ package com.modla.andy.processingcardboard;
  * library and the Google Cardboard Android SDK. The app displays an OBJ model rocket and allows
  * keyboard input to rotate, zoom with head tilt and pan left or right.
  *
- * <p/>
- * The Processing library has an abstraction layer for OPENGL making it possible
- * to write an Android Cardboard app without needing direct Android OPENGL calls.
- * Using Processing with Cardboard SDK is an alternative for writing Android VR applications.
- *
- * <p/>
- * Built with Android Studio (1.3.1)
- * <p/>
- * Cardboard SDK for Android 0.5.5
- * <p/>
- * Minimum Android API 4.1 (16)
- * <p/>
- * Tested with Sony Z1S phone, 1920x1080 pixel display, running Android version 5.0.2, and
- * hardware accelerated GPU
- *
- * <p/>
- * Issues:
- * Distortion correction is disabled because the Cardboard correction feature does not work well
- * The display is not distorted enough to matter with my Unofficial cardboard viewer lens and
- * home made viewer with stereoscopic quality lens.
- * <p/>
- * Out of memory can occur when using large images and restarting the app
- * <p/>
- * Processing-Cardboard Library build for Processing 2.2.1 IDE not implemented. Here the library
- * is included with the app as Processing source code.
- * <p/>
- *
- * notes:
- * The magnet trigger does not work well with my phone so I use new convert tap to trigger feature
- * available in Cardboard V2.
- * <p/>
- * Changes made to Processing-Anddroid core library:
- * <p/>
- * PApplet extends CardboardActivity
- * <p/>
- * SketchSurfaceView extends CardboardView
- * <p/>
- * SketchSurfaceViewGL extends CardboardView
- * <p/>
- * CardboardView rendering uses CardboardView.Renderer
- * <p/>
- * CardboardView.StereoRenderer code is also available
- * <p/>
- * PStereo class added to Processing core for stereo view control
- * <p/>
- *
- *
- *
- * Cardboard is a trademark of Google Inc.
  */
 
 import android.content.Context;
@@ -86,7 +37,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.HeadTransform;
 
 import processing.core.PApplet;
@@ -98,7 +48,6 @@ import processing.core.PShape;
 public class DisplayOBJActivity extends PApplet {
     private static String TAG = "DisplayOBJActivity";
 
-    CardboardView cardboardView;
     private Vibrator vibrator;
 
     static final float STARTX = 0f;
@@ -114,14 +63,12 @@ public class DisplayOBJActivity extends PApplet {
         super.onCreate(savedInstanceState);
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        cardboardView = (CardboardView) surfaceView;
         //cardboardView.setAlignmentMarkerEnabled(false);
         //cardboardView.setSettingsButtonEnabled(false);
+        //cardboardView.setDistortionCorrectionEnabled(false);
+        cardboardView.setTransitionViewEnabled(true);
+        cardboardView.setDistortionCorrectionEnabled(true);
         setCardboardView(cardboardView);
-        cardboardView.setDistortionCorrectionEnabled(false);
-        //cardboardView.setDistortionCorrectionEnabled(true);
-        cardboardView.setChromaticAberrationCorrectionEnabled(false);
-        //cardboardView.setChromaticAberrationCorrectionEnabled(true);
         //cardboardView.setVRModeEnabled(false); // sets Monocular mode
         //Log.d(TAG, "getVRMode=" + cardboardView.getVRMode());
         setConvertTapIntoTrigger(true);
@@ -175,7 +122,6 @@ public class DisplayOBJActivity extends PApplet {
         // The following call resumes a paused rendering thread.
         // If you de-allocated graphic objects for onPause()
         // this is a good place to re-allocate them.
-        cardboardView.onResume();
         Log.d(TAG, "onResume");
     }
 
@@ -200,11 +146,10 @@ public class DisplayOBJActivity extends PApplet {
     float roty = 0; //PI / 4;
     PShape rocket;
     PShape textImage;
-    PShape gridImage;
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
-    float eyeSeparation = convPlane / 60.f;
+    float eyeSeparation = convPlane / 1440.0f;  //60.f;
     float fieldOfViewY = 45f;
     float cameraPositionX = STARTX;
     float cameraPositionY = STARTY;
@@ -229,7 +174,6 @@ public class DisplayOBJActivity extends PApplet {
         rocket = loadShape("obj/rocket.obj");
         textSize(32);
         textImage = createTextGraphics("ROCKET");
-        gridImage = createGridShape();
         /* second constructor, custom eye separation, custom convergence */
         stereoView(
                 width, height, eyeSeparation, fieldOfViewY,
@@ -237,13 +181,6 @@ public class DisplayOBJActivity extends PApplet {
                 farPlane,
                 convPlane);
 
-        //println("Screen Width="+ width + " Height="+height);
-        // stereoPosition only needs to be called repeatedly if you are
-        // changing camera position, which we are doing
-//        stereoPosition(
-//                cameraPositionX, cameraPositionY, cameraPositionZ,
-//                0f, 0f, -1f,  // directionX, directionY, directionZ
-//                0f, 1f, 0f);  // upX, upY, upZ
         cardboardView.resetHeadTracker();
 
     }
@@ -252,6 +189,9 @@ public class DisplayOBJActivity extends PApplet {
         PGraphics buffer = createGraphics(width/2, height);
         buffer.beginDraw();
         buffer.textSize(128);
+        buffer.background(0x80800020);
+        stroke(255);
+        fill(255);
         buffer.text(s, width / 8, height / 2 + height / 4);
         buffer.endDraw();
 
@@ -270,7 +210,7 @@ public class DisplayOBJActivity extends PApplet {
 
     void drawTextGraphics(PShape s) {
         pushMatrix();
-        scale(4f);
+        scale(1f);
         translate(0, 0, -.25f);
         shape(s);
         popMatrix();
@@ -286,58 +226,13 @@ public class DisplayOBJActivity extends PApplet {
         popMatrix();
     }
 
-    // this test draw only shows up in right viewport
     public void drawText(String s, float x) {
         pushMatrix();
         stroke(255);
         fill(255);
-        scale(2f);
-        text(s, x, 0.0f, 0f);
+        scale(.02f);
+        text(s, x, 0.0f, 0.0f);
         popMatrix();
-    }
-
-    public void drawGridShape(PShape grid) {
-        pushMatrix();
-        scale(4f);
-        shape(grid);
-        popMatrix();
-    }
-
-    public PShape createGridShape() {
-        int gridSize = 1;
-        stroke(128);
-        fill(64);
-        println("width=" + width + " height="+height);
-        PGraphics buffer = createGraphics(width/2, height, P3D);
-        buffer.beginDraw();
-
-        for(int i = -20; i <20; i+=gridSize) {
-            //for (int j = -20; j < 20; j +=gridSize) {
-                int y = 1;
-                int z = 0;
-//            buffer.line(i, y, j, i + gridSize, y, j);
-//            buffer.line(i + gridSize, y, j, i + gridSize, y, j + gridSize);
-//            buffer.line(i + gridSize, y, j + gridSize, i, y, j + gridSize);
-//            buffer.line(i, y, j, i, y, j + gridSize);
-            buffer.line(i, y,  i + gridSize, y);
-            buffer.line(i + gridSize, y,  i + gridSize, y );
-            buffer.line(i + gridSize, y,  i, y);
-            buffer.line(i, y,  i, y);
-            //}
-        }
-        buffer.endDraw();
-
-        PShape face = createShape();
-        face.beginShape(QUAD);
-        face.noStroke();
-        face.textureMode(NORMAL);
-        face.texture(buffer);
-        face.vertex(-1, -1, 0, 0, 0);
-        face.vertex(1, -1, 0, 1, 0);
-        face.vertex(1, 1, 0, 1, 1);
-        face.vertex(-1, 1, 0, 0, 1);
-        face.endShape();
-        return face;
     }
 
     public void drawGrid() {
@@ -450,7 +345,7 @@ public class DisplayOBJActivity extends PApplet {
             if ((cameraPositionZ > ZBOUND_IN && rollSpeed < 0) ||
                     (cameraPositionZ < ZBOUND_OUT && rollSpeed > 0) ||
                     (cameraPositionZ <= ZBOUND_OUT && cameraPositionZ >= ZBOUND_IN))
-                cameraPositionZ += rollSpeed;
+                cameraPositionZ -= rollSpeed;
 
 //            Log.d(TAG, "Normalized quaternion " + pitch + " " + yaw + " " + roll + " Camera position "+ cameraPositionX + " " + cameraPositionY + " " + cameraPositionZ);
         } else {
@@ -473,11 +368,10 @@ public class DisplayOBJActivity extends PApplet {
      */
     @Override
     public void drawLeft() {
-        //drawGridShape(gridImage);
         drawShape(rocket);
-        //drawGrid();
         drawTextGraphics(textImage);
-        drawText("Spaceship", 30.0f);
+        drawText("Space", 30.0f);
+        drawGrid();
     }
 
     /**
@@ -485,11 +379,10 @@ public class DisplayOBJActivity extends PApplet {
      */
     @Override
     public void drawRight() {
-        //drawGridShape(gridImage);
         drawShape(rocket);
-        //drawGrid();
         drawTextGraphics(textImage);
-        drawText("Spaceship", 30.0f);
+        drawText("Space", 30.0f);
+        drawGrid();
     }
 
     /**

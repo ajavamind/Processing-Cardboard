@@ -423,10 +423,7 @@ public class PGLES extends PGL {
           @Override
           public void run() {
             sketch.doExit = false;
-            sketch.g.endPGL();
-            sketch.g.resetShader();
-            //Log.d(TAG, "onFinishFrame run Activity.finish()");
-            sketch.finish();
+            sketch.onBackPressed();
           }
         });
       }

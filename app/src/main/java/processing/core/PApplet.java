@@ -74,7 +74,6 @@ import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -105,7 +104,7 @@ import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PShader;
 
 public class PApplet extends CardboardActivity
-        implements PConstants {
+        implements SurfaceHolder.Callback, PConstants {
     private static String TAG = "PApplet";
 
     /**
@@ -158,6 +157,40 @@ public class PApplet extends CardboardActivity
      * even though it's technically different than the desktop version.
      */
     public String sketchPath; //folder;
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        if (DEBUG) {
+            System.out.println("surfaceCreated()");
+        }
+        surfaceView.surfaceCreated(holder);
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        if (DEBUG) {
+            System.out.println("SketchSurfaceView3D.surfaceChanged() " + w + " " + h);
+        }
+        //surfaceView.surfaceChanged(holder, format, width, height);  // this sometimes prevents rendering from starting!!
+        surfaceChanged = true;
+
+////      width = w;
+////      height = h;
+////      g.setSize(w, h);
+//
+//            // No need to call g.setSize(width, height) b/c super.surfaceChanged()
+//            // will trigger onSurfaceChanged in the renderer, which calls setSize().
+//            // -- apparently not true? (100110)
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        if (DEBUG) {
+            System.out.println("surfaceDestroyed()");
+        }
+        surfaceView.surfaceDestroyed(holder);
+    }
 
     /** When debugging headaches */
 //  static final boolean THREAD_DEBUG = false;
@@ -418,7 +451,8 @@ public class PApplet extends CardboardActivity
     protected boolean paused;
 
     protected GLSurfaceView surfaceView;
-
+    protected CardboardView cardboardView;
+    protected SurfaceHolder surfaceHolder;
 
     /**
      * The Window object for Android.
@@ -587,11 +621,15 @@ public class PApplet extends CardboardActivity
 
         if (rendererName.equals(JAVA2D)) {
             // JAVA2D renderer
-            surfaceView = new SketchSurfaceView(this, sw, sh,
+            //surfaceView = new SketchSurfaceView(this, sw, sh,
+            //        (Class<? extends PGraphicsAndroid2D>) rendererClass);
+            cardboardView = new SketchSurfaceView(this, sw, sh,
                     (Class<? extends PGraphicsAndroid2D>) rendererClass);
         } else if (PGraphicsOpenGL.class.isAssignableFrom(rendererClass)) {
             // P2D, P3D, and any other PGraphicsOpenGL-based renderer
-            surfaceView = new SketchSurfaceViewGL(this, sw, sh,
+            //surfaceView = new SketchSurfaceViewGL(this, sw, sh,
+            //        (Class<? extends PGraphicsOpenGL>) rendererClass);
+            cardboardView = new SketchSurfaceViewGL(this, sw, sh,
                     (Class<? extends PGraphicsOpenGL>) rendererClass);
         } else {
             // Anything else
@@ -600,6 +638,15 @@ public class PApplet extends CardboardActivity
             throw new RuntimeException(message);
         }
 
+        surfaceView = cardboardView.getGLSurfaceView();
+        //surfaceView.setEGLContextClientVersion(2); causes exception set renderer already called
+        //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY); // DO NOT use with cardboard
+        surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+        surfaceView.setDebugFlags(3);
+        surfaceHolder = surfaceView.getHolder();
+        surfaceHolder.addCallback(this);
+        //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
+
         //set smooth level
         if (smooth == 0) {
             g.noSmooth();
@@ -607,7 +654,7 @@ public class PApplet extends CardboardActivity
             g.smooth(smooth);
         }
 
-        window.setContentView(surfaceView);
+        window.setContentView(cardboardView);
 
     /*
     // Here we use Honeycomb API (11+) to hide (in reality, just make the status icons into small dots)
@@ -1031,12 +1078,11 @@ public class PApplet extends CardboardActivity
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-    public class SketchSurfaceView extends CardboardView implements // SurfaceView implements
-            SurfaceHolder.Callback {
+    public class SketchSurfaceView extends CardboardView
+            //implements SurfaceHolder.Callback
+    {
 
         PGraphicsAndroid2D g2;
-        SurfaceHolder surfaceHolder;
-
 
         public SketchSurfaceView(Context context, int wide, int high,
                                  Class<? extends PGraphicsAndroid2D> clazz) {
@@ -1045,8 +1091,8 @@ public class PApplet extends CardboardActivity
 //      println("surface holder");
             // Install a SurfaceHolder.Callback so we get notified when the
             // underlying surface is created and destroyed
-            surfaceHolder = getHolder();
-            surfaceHolder.addCallback(this);
+//            surfaceHolder = getHolder();
+//            surfaceHolder.addCallback(this);
 //      surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU); // no longer needed.
 
 //      println("creating graphics");
@@ -1154,8 +1200,6 @@ public class PApplet extends CardboardActivity
 
     public class SketchSurfaceViewGL extends CardboardView {  //GLSurfaceView {
         PGraphicsOpenGL g3;
-        SurfaceHolder surfaceHolder;
-
 
         @SuppressWarnings("deprecation")
         public SketchSurfaceViewGL(Context context, int wide, int high,
@@ -1171,10 +1215,10 @@ public class PApplet extends CardboardActivity
                 throw new RuntimeException("OpenGL ES 2.0 is not supported by this device.");
             }
 
-            surfaceHolder = getHolder();
-            // are these two needed?
-            surfaceHolder.addCallback(this);
-            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
+//            surfaceHolder = getHolder();
+//            // are these two needed?
+//            surfaceHolder.addCallback(this);
+//            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
 
             // The PGraphics object needs to be created here so the renderer is not
             // null. This is required because PApplet.onResume events (which call
@@ -1204,18 +1248,17 @@ public class PApplet extends CardboardActivity
             g3.setSize(wide, high);
 
             // Tells the default EGLContextFactory and EGLConfigChooser to create an GLES2 context.
-            setEGLContextClientVersion(2);
+            //setEGLContextClientVersion(2);
+            //surfaceView.setEGLContextClientVersion(2);
 
-            int quality = sketchQuality();
-            if (1 < quality) {
-                setEGLConfigChooser(((PGLES) g3.pgl).getConfigChooser(quality));
-            }
+//            int quality = sketchQuality();
+//            if (1 < quality) {
+//                setEGLConfigChooser(((PGLES) g3.pgl).getConfigChooser(quality));
+//            }
 
-            // The renderer can be set only once, decide now.
+            // The renderer can be set only once, decide now. We pick StereoRenderer
             //setRenderer(((PGLES) g3.pgl).getCardboardRenderer());
             setRenderer(((PGLES) g3.pgl).getCardboardStereoRenderer());  // use with distortion correction enabled
-            //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY); // DO NOT use with cardboard
-            setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
             // assign this g to the PApplet
             g = g3;
@@ -1231,56 +1274,56 @@ public class PApplet extends CardboardActivity
         }
 
 
-        // part of SurfaceHolder.Callback
-        @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            super.surfaceCreated(holder);
-            if (DEBUG) {
-                System.out.println("surfaceCreated()");
-            }
-        }
-
-
-        // part of SurfaceHolder.Callback
-        @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            super.surfaceDestroyed(holder);
-            if (DEBUG) {
-                System.out.println("surfaceDestroyed()");
-            }
-
-
-      /*
-      // TODO: Check how to make sure of calling g3.dispose() when this call to
-      // surfaceDestoryed corresponds to the sketch being shut down instead of just
-      // taken to the background.
-
-      // For instance, something like this would be ok?
-      // The sketch is being stopped, so we dispose the resources.
-      if (!paused) {
-        g3.dispose();
-      }
-      */
-        } // PApplet class
-
-
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            super.surfaceChanged(holder, format, w, h);
-
-            if (DEBUG) {
-                System.out.println("SketchSurfaceView3D.surfaceChanged() " + w + " " + h);
-            }
-            surfaceChanged = true;
-//      width = w;
-//      height = h;
-//      g.setSize(w, h);
-
-            // No need to call g.setSize(width, height) b/c super.surfaceChanged()
-            // will trigger onSurfaceChanged in the renderer, which calls setSize().
-            // -- apparently not true? (100110)
-        }
-
+//        // part of SurfaceHolder.Callback
+//        @Override
+//        public void surfaceCreated(SurfaceHolder holder) {
+//            super.surfaceCreated(holder);
+//            if (DEBUG) {
+//                System.out.println("surfaceCreated()");
+//            }
+//        }
+//
+//
+//        // part of SurfaceHolder.Callback
+//        @Override
+//        public void surfaceDestroyed(SurfaceHolder holder) {
+//            super.surfaceDestroyed(holder);
+//            if (DEBUG) {
+//                System.out.println("surfaceDestroyed()");
+//            }
+//
+//
+//      /*
+//      // TODO: Check how to make sure of calling g3.dispose() when this call to
+//      // surfaceDestoryed corresponds to the sketch being shut down instead of just
+//      // taken to the background.
+//
+//      // For instance, something like this would be ok?
+//      // The sketch is being stopped, so we dispose the resources.
+//      if (!paused) {
+//        g3.dispose();
+//      }
+//      */
+//        } // PApplet class
+//
+//
+//        @Override
+//        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+//            super.surfaceChanged(holder, format, w, h);
+//
+//            if (DEBUG) {
+//                System.out.println("SketchSurfaceView3D.surfaceChanged() " + w + " " + h);
+//            }
+//            surfaceChanged = true;
+////      width = w;
+////      height = h;
+////      g.setSize(w, h);
+//
+//            // No need to call g.setSize(width, height) b/c super.surfaceChanged()
+//            // will trigger onSurfaceChanged in the renderer, which calls setSize().
+//            // -- apparently not true? (100110)
+//        }
+//
 
         /**
          * Inform the view that the window focus has changed.
@@ -2606,6 +2649,8 @@ public class PApplet extends CardboardActivity
                 draw();
                 pStereo.leftEye(eye);
                 drawLeft();
+                pStereo.leftEye(eye);  // needed to force draw in left viewport
+                // see https://forum.processing.org/two/discussion/7204/opengl-multiple-views-and-coordinates
             }
         }
     }
@@ -3774,22 +3819,18 @@ public class PApplet extends CardboardActivity
     final public void dispose() {
         // moved here from stop()
         finished = true;  // let the sketch know it is shut down time
-
-
+        activity = null;
         // don't run stop and disposers twice
-        if (thread == null) return;
-        thread = null;
 
         // call to shut down renderer, in case it needs it (pdf does)
         if (g != null) g.dispose();
-
-
-
-
-
+        surfaceView.destroyDrawingCache();
+        surfaceView.surfaceDestroyed(surfaceView.getHolder());
+        surfaceView = null;
+//        window = null;
         handleMethods("dispose");
-
-
+        if (thread == null) return;
+        thread = null;
     }
 
 

@@ -2,46 +2,62 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.modla.andy.processingcardboard"
     android:versionCode="3"
-    android:versionName="3.0"
-    >
+    android:versionName="3.0">
+
+    <uses-sdk
+        android:minSdkVersion="19"
+        android:targetSdkVersion="23" />
+    <!--kitkat 4.4 is version 19 and  Marshmallow 6.0 is version 23-->
+    <!--  raised minSdkVersion to 19 from 16 (jellybean 4.1) for better image processing performance -->
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
-    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="true" />
-    <uses-feature android:name="android.hardware.sensor.compass" android:required="true" />
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="19"/>
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.sensor.gyroscope"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.sensor.compass"
+        android:required="true" />
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="Processing Cardboard Demo"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:icon="@mipmap/ic_launcher"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|keyboardHidden|screenSize" >
+            android:label="Processing Cardboard Demo"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="com.google.intent.category.CARDBOARD" />
             </intent-filter>
         </activity>
         <activity
             android:name=".DisplayOBJActivity"
-            android:label="DisplayOBJ"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:icon="@mipmap/ic_launcher"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|keyboardHidden|screenSize" >
+            android:label="DisplayOBJ"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="com.google.intent.category.CARDBOARD" />
             </intent-filter>
@@ -50,39 +66,65 @@
         <!-- Experimental code under construction -->
         <!--<activity-->
             <!--android:name=".PaintActivity"-->
-            <!--android:label="LightPaintVR"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
             <!--android:icon="@mipmap/ic_launcher"-->
-            <!--android:screenOrientation="landscape"-->
-            <!--android:configChanges="orientation|keyboardHidden|screenSize" >-->
+            <!--android:label="LightPaintVR"-->
+            <!--android:screenOrientation="landscape">-->
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
+
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         <!--</activity>-->
         <!--<activity-->
             <!--android:name=".PhotoActivity"-->
-            <!--android:label="Photo Test"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
             <!--android:icon="@mipmap/ic_launcher"-->
-            <!--android:screenOrientation="landscape"-->
-            <!--android:configChanges="orientation|keyboardHidden|screenSize" >-->
+            <!--android:label="Photo Test"-->
+            <!--android:screenOrientation="landscape">-->
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
                 <!--<category android:name="com.google.intent.category.CARDBOARD" />-->
             <!--</intent-filter>-->
         <!--</activity>-->
+
+        <!--<activity-->
+            <!--android:name=".PhotoViewerActivity"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
+            <!--android:icon="@mipmap/ic_launcher"-->
+            <!--android:label="Photo Viewer Test"-->
+            <!--android:screenOrientation="landscape"-->
+            <!--android:launchMode="singleInstance"-->
+            <!--android:noHistory="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!--<category android:name="com.google.intent.category.CARDBOARD" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
         <!--<activity-->
             <!--android:name=".GridActivity"-->
-            <!--android:label="Grid"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
             <!--android:icon="@mipmap/ic_launcher"-->
-            <!--android:screenOrientation="landscape"-->
-            <!--android:configChanges="orientation|keyboardHidden|screenSize" >-->
+            <!--android:label="Grid"-->
+            <!--android:screenOrientation="landscape">-->
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         <!--</activity>-->
-
+        <!--<activity-->
+            <!--android:name=".FullscreenActivity"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
+            <!--android:label="@string/title_activity_fullscreen"-->
+            <!--android:theme="@style/FullscreenTheme">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
     </application>
 
 </manifest>

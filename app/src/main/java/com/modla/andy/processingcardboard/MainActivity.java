@@ -99,7 +99,6 @@ import processing.core.PShape;
 public class MainActivity extends PApplet {
     private static String TAG = "MainActivity";
 
-    CardboardView cardboardView;
     private Vibrator vibrator;
     PImage[] photo = null;
     PImage[] photoRight = null;
@@ -119,16 +118,14 @@ public class MainActivity extends PApplet {
         super.onCreate(savedInstanceState);
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        cardboardView = (CardboardView) surfaceView;
         //cardboardView.setAlignmentMarkerEnabled(false);
         //cardboardView.setSettingsButtonEnabled(false);
         setCardboardView(cardboardView);
-        cardboardView.setDistortionCorrectionEnabled(false);
+        //cardboardView.setDistortionCorrectionEnabled(false);
         //cardboardView.setDistortionCorrectionEnabled(true);
-        cardboardView.setChromaticAberrationCorrectionEnabled(false);
-        //cardboardView.setChromaticAberrationCorrectionEnabled(true);
+        cardboardView.setTransitionViewEnabled(true);
         //cardboardView.setVRModeEnabled(false); // sets Monocular mode
-        //Log.d(TAG, "getVRMode=" + cardboardView.getVRMode());
+        Log.d(TAG, "getVRMode=" + cardboardView.getVRMode());
         setConvertTapIntoTrigger(true);
         Log.d(TAG, "getConvertTapIntoTrigger=" + getConvertTapIntoTrigger());
 
@@ -170,7 +167,6 @@ public class MainActivity extends PApplet {
         // If your OpenGL application is memory intensive,
         // you should consider de-allocating objects that
         // consume significant memory here.
-        cardboardView.onPause();
         Log.d(TAG, "onPause");
     }
 
@@ -180,7 +176,6 @@ public class MainActivity extends PApplet {
         // The following call resumes a paused rendering thread.
         // If you de-allocated graphic objects for onPause()
         // this is a good place to re-allocate them.
-        cardboardView.onResume();
         Log.d(TAG, "onResume");
     }
 
@@ -219,7 +214,7 @@ public class MainActivity extends PApplet {
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
-    float eyeSeparation = convPlane/30.0f;
+    float eyeSeparation = convPlane/ 1440.f;  // 30.0f;
     float fieldOfViewY = 45f;
     float cameraPositionX = STARTX;
     float cameraPositionY = STARTY;
@@ -277,13 +272,6 @@ public class MainActivity extends PApplet {
 
         // set up stereo view
         stereoView(width, height, eyeSeparation, fieldOfViewY, nearPlane, farPlane, convPlane);
-
-        //println("Screen Width="+ width + " Height="+height);
-        // stereoPosition only needs to be called repeatedly if you are
-        // changing camera position, which we are doing
-        stereoPosition(cameraPositionX, cameraPositionY, cameraPositionZ,
-                0f, 0f, -1f,  // directionX, directionY, directionZ
-                0f, 1f, 0f);  // upX, upY, upZ
 
         cardboardView.resetHeadTracker();
 
@@ -564,7 +552,7 @@ public class MainActivity extends PApplet {
             if ((cameraPositionZ > ZBOUND_IN && rollSpeed < 0) ||
                     (cameraPositionZ < ZBOUND_OUT && rollSpeed > 0) ||
                     (cameraPositionZ <= ZBOUND_OUT && cameraPositionZ >= ZBOUND_IN))
-                cameraPositionZ += rollSpeed;
+                cameraPositionZ -= rollSpeed;
 
 //            Log.d(TAG, "Normalized quaternion " + pitch + " " + yaw + " " + roll + " Camera position "+ cameraPositionX + " " + cameraPositionY + " " + cameraPositionZ);
         } else {
@@ -609,7 +597,6 @@ public class MainActivity extends PApplet {
      */
     @Override
     public void draw() {
-        //println("draw()");
         background(0);
         stereoPosition(
                 cameraPositionX, cameraPositionY, cameraPositionZ,
