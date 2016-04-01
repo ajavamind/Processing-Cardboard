@@ -79,11 +79,11 @@ The app examples also show how to display text and graphics (reticle).
 
 No distortion correction:
 
-![Screenshot](Screenshot_2016-01-24-10-35-00.png)
+![No Distortion Correction Screenshot](Screenshot_2016-01-24-10-35-00.png)
 
 Distortion correction enabled:
 
-![Screenshot](Screenshot_2016-03-31-16-05-40.png)
+![Distortion Correction Screenshot](Screenshot_2016-03-31-16-05-40.png)
 
 ## Issues:
  
@@ -119,3 +119,5 @@ https://play.google.com/store/apps/details?id=com.modla.andy.swarm3dfree
  Creative Coding Lab is the EVL Creative Coding Research Group at The University of Illinois at Chicago https://www.evl.uic.edu/creativecoding/about.php
  
  Cardboard is a trademark of Google Inc. http://google.com/cardboard 
+ 
+ View-Master is a trademark of Mattel Inc.
