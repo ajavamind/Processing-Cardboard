@@ -99,6 +99,10 @@ Distortion correction enabled:
   2. Text and line drawing now work on screen directly in the correct eye viewport.
   3. Modifications to use Cardboard libraries version 0.7.0.
   
+### 2016/05/21
+  
+  1. Modifications for Cardboard VR version 0.8.0
+
 ## Notes:
  The magnet pull trigger does not work well with my phone so I use new convert tap to trigger feature
  available in Cardboard V2.
@@ -108,7 +112,7 @@ Distortion correction enabled:
  Recommend Android 4.4 for faster image/photo processing and display
 
 ## Usage Example
-I wrote a simple demonstration arcade game for Google Cardboard based on the code here. Check it out at:
+I wrote a simple demonstration arcade game/simulation for Google Cardboard VR based on the code here. Check it out at:
 
 https://play.google.com/store/apps/details?id=com.modla.andy.swarm3dfree
 

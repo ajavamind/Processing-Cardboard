@@ -69,24 +69,28 @@ import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
+//import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+//import android.view.SurfaceView;
+//import android.view.View;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.google.vrtoolkit.cardboard.CardboardActivity;
-import com.google.vrtoolkit.cardboard.CardboardView;
-import com.google.vrtoolkit.cardboard.Eye;
-import com.google.vrtoolkit.cardboard.HeadTransform;
+import com.google.vr.sdk.base.GvrActivity;
+import com.google.vr.sdk.base.GvrView;
+import com.google.vr.sdk.base.Eye;
+import com.google.vr.sdk.base.HeadTransform;
 
 import processing.data.JSONArray;
 import processing.data.JSONObject;
@@ -103,8 +107,9 @@ import processing.opengl.PGraphics3D;
 import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PShader;
 
-public class PApplet extends CardboardActivity
-        implements SurfaceHolder.Callback, PConstants {
+public class PApplet extends GvrActivity
+        implements PConstants {
+    //implements SurfaceHolder.Callback, PConstants {
     private static String TAG = "PApplet";
 
     /**
@@ -158,39 +163,6 @@ public class PApplet extends CardboardActivity
      */
     public String sketchPath; //folder;
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        if (DEBUG) {
-            System.out.println("surfaceCreated()");
-        }
-        surfaceView.surfaceCreated(holder);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        if (DEBUG) {
-            System.out.println("SketchSurfaceView3D.surfaceChanged() " + w + " " + h);
-        }
-        //surfaceView.surfaceChanged(holder, format, width, height);  // this sometimes prevents rendering from starting!!
-        surfaceChanged = true;
-
-////      width = w;
-////      height = h;
-////      g.setSize(w, h);
-//
-//            // No need to call g.setSize(width, height) b/c super.surfaceChanged()
-//            // will trigger onSurfaceChanged in the renderer, which calls setSize().
-//            // -- apparently not true? (100110)
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        if (DEBUG) {
-            System.out.println("surfaceDestroyed()");
-        }
-        surfaceView.surfaceDestroyed(holder);
-    }
 
     /** When debugging headaches */
 //  static final boolean THREAD_DEBUG = false;
@@ -450,9 +422,9 @@ public class PApplet extends CardboardActivity
      */
     protected boolean paused;
 
-    protected GLSurfaceView surfaceView;
-    protected CardboardView cardboardView;
-    protected SurfaceHolder surfaceHolder;
+    //protected GLSurfaceView surfaceView;
+    protected GvrView cardboardView;
+    //protected SurfaceHolder surfaceHolder;
 
     /**
      * The Window object for Android.
@@ -587,12 +559,13 @@ public class PApplet extends CardboardActivity
         // This does the actual full screen work
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        displayWidth = dm.widthPixels;
-        displayHeight = dm.heightPixels;
-
+        Display display = getWindowManager().getDefaultDisplay();
+        display.getMetrics(dm);
+        Point size = new Point();
+        display.getRealSize(size);
+        displayWidth = size.x;
+        displayHeight = size.y;
 
         //Setting the default height and width to be fullscreen
         width = displayWidth;
@@ -621,14 +594,10 @@ public class PApplet extends CardboardActivity
 
         if (rendererName.equals(JAVA2D)) {
             // JAVA2D renderer
-            //surfaceView = new SketchSurfaceView(this, sw, sh,
-            //        (Class<? extends PGraphicsAndroid2D>) rendererClass);
             cardboardView = new SketchSurfaceView(this, sw, sh,
                     (Class<? extends PGraphicsAndroid2D>) rendererClass);
         } else if (PGraphicsOpenGL.class.isAssignableFrom(rendererClass)) {
             // P2D, P3D, and any other PGraphicsOpenGL-based renderer
-            //surfaceView = new SketchSurfaceViewGL(this, sw, sh,
-            //        (Class<? extends PGraphicsOpenGL>) rendererClass);
             cardboardView = new SketchSurfaceViewGL(this, sw, sh,
                     (Class<? extends PGraphicsOpenGL>) rendererClass);
         } else {
@@ -638,13 +607,13 @@ public class PApplet extends CardboardActivity
             throw new RuntimeException(message);
         }
 
-        surfaceView = cardboardView.getGLSurfaceView();
+        //surfaceView = cardboardView.getGLSurfaceView();
         //surfaceView.setEGLContextClientVersion(2); causes exception set renderer already called
         //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY); // DO NOT use with cardboard
-        surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        surfaceView.setDebugFlags(3);
-        surfaceHolder = surfaceView.getHolder();
-        surfaceHolder.addCallback(this);
+        //surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+        //surfaceView.setDebugFlags(3);
+        //surfaceHolder = surfaceView.getHolder();
+        //surfaceHolder.addCallback(this);
         //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
 
         //set smooth level
@@ -656,236 +625,16 @@ public class PApplet extends CardboardActivity
 
         window.setContentView(cardboardView);
 
-    /*
-    // Here we use Honeycomb API (11+) to hide (in reality, just make the status icons into small dots)
-    // the status bar. Since the core is still built against API 7 (2.1), we use introspection to get
-    // the setSystemUiVisibility() method from the view class.
-    Method visibilityMethod = null;
-    try {
-      visibilityMethod = surfaceView.getClass().getMethod("setSystemUiVisibility", new Class[] { int.class});
-    } catch (NoSuchMethodException e) {
-      // Nothing to do. This means that we are running with a version of Android previous to Honeycomb.
-    }
-    if (visibilityMethod != null) {
-      try {
-        // This is equivalent to calling:
-        //surfaceView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        // The value of View.STATUS_BAR_HIDDEN is 1.
-        visibilityMethod.invoke(surfaceView, new Object[] { 1 });
-      } catch (InvocationTargetException e) {
-      } catch (IllegalAccessException e) {
-      }
-    }
-    window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    */
-
-
-
         finished = false; // just for clarity
 
         // this will be cleared by draw() if it is not overridden
         looping = true;
         redraw = true;  // draw this guy once
-//    firstMotion = true;
 
         Context context = getApplicationContext();
         sketchPath = context.getFilesDir().getAbsolutePath();
-
-//    Looper.prepare();
-//        handler = new Handler();
-//    println("calling loop()");
-//    Looper.loop();
-//    println("done with loop() call, will continue...");
-
-        // start();// by not calling start, we use cardboard main thread loop instead of Processing draw thread
-    }  // onCreate()
-
-
-
-//  /** Called with the activity is first created. */
-//  @SuppressWarnings("unchecked")
-//  @Override
-//  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//      Bundle savedInstanceState) {
-//
-//    if (DEBUG) println("onCreateView() happening here: " + Thread.currentThread().getName());
-//
-//    activity = getActivity();
-//    View rootView;
-//
-//    DisplayMetrics dm = new DisplayMetrics();
-//    activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
-//    displayWidth = dm.widthPixels;
-//    displayHeight = dm.heightPixels;
-//
-//    //Setting the default height and width to be fullscreen
-//    width = displayWidth;
-//    height = displayHeight;
-////    println("density is " + dm.density);
-////    println("densityDpi is " + dm.densityDpi);
-//    if (DEBUG) println("display metrics: " + dm);
-//
-//    //println("screen size is " + screenWidth + "x" + screenHeight);
-//
-////    LinearLayout layout = new LinearLayout(this);
-////    layout.setOrientation(LinearLayout.VERTICAL | LinearLayout.HORIZONTAL);
-////    viewGroup = new ViewGroup();
-////    surfaceView.setLayoutParams();
-////    viewGroup.setLayoutParams(LayoutParams.)
-////    RelativeLayout layout = new RelativeLayout(this);
-////    RelativeLayout overallLayout = new RelativeLayout(this);
-////    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.FILL_PARENT);
-////lp.addRule(RelativeLayout.RIGHT_OF, tv1.getId());
-////    layout.setGravity(RelativeLayout.CENTER_IN_PARENT);
-//
-//    handleSettings();
-//
-//    int sw = sketchWidth();
-//    int sh = sketchHeight();
-//
-//    // Get renderer name and class
-//    String rendererName = sketchRenderer();
-//    Class<?> rendererClass = null;
-//    try {
-//      rendererClass = Class.forName(rendererName);
-//    } catch (ClassNotFoundException exception) {
-//      String message = String.format(
-//        "Error: Could not resolve renderer class name: %s", rendererName);
-//      throw new RuntimeException(message, exception);
-//    }
-//
-//    if (rendererName.equals(JAVA2D)) {
-//      // JAVA2D renderer
-//      surfaceView = new SketchSurfaceView(activity, sw, sh,
-//        (Class<? extends PGraphicsAndroid2D>) rendererClass);
-//    } else if (PGraphicsOpenGL.class.isAssignableFrom(rendererClass)) {
-//      // P2D, P3D, and any other PGraphicsOpenGL-based renderer
-//      surfaceView = new SketchSurfaceViewGL(activity, sw, sh,
-//        (Class<? extends PGraphicsOpenGL>) rendererClass);
-//    } else {
-//      // Anything else
-//      String message = String.format(
-//        "Error: Unsupported renderer class: %s", rendererName);
-//      throw new RuntimeException(message);
-//    }
-//
-//    //set smooth level
-//    if (smooth == 0) {
-//      g.noSmooth();
-//    } else {
-//      g.smooth(smooth);
-//    }
-//
-////    g = ((SketchSurfaceView) surfaceView).getGraphics();
-//
-////    surfaceView.setLayoutParams(new LayoutParams(sketchWidth(), sketchHeight()));
-//
-////    layout.addView(surfaceView);
-////    surfaceView.setVisibility(1);
-////    println("visibility " + surfaceView.getVisibility() + " " + SurfaceView.VISIBLE);
-////    layout.addView(surfaceView);
-////    AttributeSet as = new AttributeSet();
-////    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(layout, as);
-//
-////    lp.addRule(android.R.styleable.ViewGroup_Layout_layout_height,
-////    layout.add
-//    //lp.addRule(, arg1)
-//    //layout.addView(surfaceView, sketchWidth(), sketchHeight());
-//
-////      new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-////        RelativeLayout.LayoutParams.FILL_PARENT);
-//
-//    if (sw == displayWidth && sh == displayHeight) {
-//      // If using the full screen, don't embed inside other layouts
-////      window.setContentView(surfaceView);
-//      rootView = surfaceView;
-//    } else {
-//      // If not using full screen, setup awkward view-inside-a-view so that
-//      // the sketch can be centered on screen. (If anyone has a more efficient
-//      // way to do this, please file an issue on Google Code, otherwise you
-//      // can keep your "talentless hack" comments to yourself. Ahem.)
-//      RelativeLayout overallLayout = new RelativeLayout(activity);
-//      RelativeLayout.LayoutParams lp =
-//        new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-//                                        LayoutParams.WRAP_CONTENT);
-//      lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-//
-//      LinearLayout layout = new LinearLayout(activity);
-//      layout.addView(surfaceView, sketchWidth(), sketchHeight());
-//      overallLayout.addView(layout, lp);
-////      window.setContentView(overallLayout);
-//      rootView = overallLayout;
-//    }
-//
-//    /*
-//    // Here we use Honeycomb API (11+) to hide (in reality, just make the status icons into small dots)
-//    // the status bar. Since the core is still built against API 7 (2.1), we use introspection to get
-//    // the setSystemUiVisibility() method from the view class.
-//    Method visibilityMethod = null;
-//    try {
-//      visibilityMethod = surfaceView.getClass().getMethod("setSystemUiVisibility", new Class[] { int.class});
-//    } catch (NoSuchMethodException e) {
-//      // Nothing to do. This means that we are running with a version of Android previous to Honeycomb.
-//    }
-//    if (visibilityMethod != null) {
-//      try {
-//        // This is equivalent to calling:
-//        //surfaceView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-//        // The value of View.STATUS_BAR_HIDDEN is 1.
-//        visibilityMethod.invoke(surfaceView, new Object[] { 1 });
-//      } catch (InvocationTargetException e) {
-//      } catch (IllegalAccessException e) {
-//      }
-//    }
-//    window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//    */
-//
-//
-////    layout.addView(surfaceView, lp);
-////    surfaceView.setLayoutParams(new LayoutParams(sketchWidth(), sketchHeight()));
-//
-////    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams()
-////    layout.addView(surfaceView, new LayoutParams(arg0)
-//
-//    // TODO probably don't want to set these here, can't we wait for surfaceChanged()?
-//    // removing this in 0187
-////    width = screenWidth;
-////    height = screenHeight;
-//
-////    int left = (screenWidth - iwidth) / 2;
-////    int right = screenWidth - (left + iwidth);
-////    int top = (screenHeight - iheight) / 2;
-////    int bottom = screenHeight - (top + iheight);
-////    surfaceView.setPadding(left, top, right, bottom);
-//    // android:layout_width
-//
-////    window.setContentView(surfaceView);  // set full screen
-//
-//    // code below here formerly from init()
-//
-//    //millisOffset = System.currentTimeMillis(); // moved to the variable declaration
-//
-//    finished = false; // just for clarity
-//
-//    // this will be cleared by draw() if it is not overridden
-//    looping = true;
-//    redraw = true;  // draw this guy once
-////    firstMotion = true;
-//
-//    sketchPath = activity.getFilesDir().getAbsolutePath();
-//
-////    Looper.prepare();
-//    handler = new Handler();
-////    println("calling loop()");
-////    Looper.loop();
-////    println("done with loop() call, will continue...");
-//
-//    start();
-//    return rootView;
-//  }
-//
+        // by not calling start on loop thread, we use cardboard main thread loop instead of Processing draw thread
+    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -947,6 +696,9 @@ public class PApplet extends CardboardActivity
         insideSettings = false;
     }
 
+    public void setSurfaceChanged(boolean state) {
+        surfaceChanged = state;
+    }
 
     public void settings() {
         //It'll be empty. Will be overridden by user's sketch class.
@@ -1054,32 +806,13 @@ public class PApplet extends CardboardActivity
     // TODO this is only used by A2D, when finishing up a draw. but if the
     // surfaceview has changed, then it might belong to an a3d surfaceview. hrm.
     public SurfaceHolder getSurfaceHolder() {
-        return surfaceView.getHolder();
-//    return surfaceHolder;
+        //return surfaceView.getHolder();
+        return null;
+        //return surfaceHolder;
     }
 
 
-    /**
-     * Not official API, not guaranteed to work in the future.
-     */
-    public SurfaceView getSurfaceView() {
-        return surfaceView;
-    }
-
-
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-//  public interface SketchSurfaceView {
-//    public PGraphics getGraphics();
-//  }
-
-
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-    public class SketchSurfaceView extends CardboardView
-            //implements SurfaceHolder.Callback
+    public class SketchSurfaceView extends GvrView
     {
 
         PGraphicsAndroid2D g2;
@@ -1087,15 +820,6 @@ public class PApplet extends CardboardActivity
         public SketchSurfaceView(Context context, int wide, int high,
                                  Class<? extends PGraphicsAndroid2D> clazz) {
             super(context);
-
-//      println("surface holder");
-            // Install a SurfaceHolder.Callback so we get notified when the
-            // underlying surface is created and destroyed
-//            surfaceHolder = getHolder();
-//            surfaceHolder.addCallback(this);
-//      surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU); // no longer needed.
-
-//      println("creating graphics");
             if (clazz.equals(PGraphicsAndroid2D.class)) {
                 g2 = new PGraphicsAndroid2D();
             } else {
@@ -1112,51 +836,13 @@ public class PApplet extends CardboardActivity
 
             // Set semi-arbitrary size; will be set properly when surfaceChanged() called
             g2.setSize(wide, high);
-//      newGraphics.setSize(getWidth(), getHeight());
             g2.setParent(PApplet.this);
             g2.setPrimary(true);
-            // Set the value for 'g' once everything is ready (otherwise rendering
-            // may attempt before setSize(), setParent() etc)
-//      g = newGraphics;
             g = g2;  // assign the g object for the PApplet
-
-//      println("setting focusable, requesting focus");
             setFocusable(true);
             setFocusableInTouchMode(true);
             requestFocus();
-//      println("done making surface view");
         }
-
-
-//    public PGraphics getGraphics() {
-//      return g2;
-//    }
-
-
-        // part of SurfaceHolder.Callback
-        public void surfaceCreated(SurfaceHolder holder) {
-        }
-
-
-        // part of SurfaceHolder.Callback
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            //g2.dispose();
-        }
-
-
-        // part of SurfaceHolder.Callback
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            if (DEBUG) {
-                System.out.println("SketchSurfaceView2D.surfaceChanged() " + w + " " + h);
-            }
-            surfaceChanged = true;
-
-//      width = w;
-//      height = h;
-//
-//      g.setSize(w, h);
-        }
-
 
         @Override
         public void onWindowFocusChanged(boolean hasFocus) {
@@ -1185,20 +871,10 @@ public class PApplet extends CardboardActivity
             return super.onKeyUp(code, event);
         }
 
-
-        // don't think i want to call stop() from here, since it might be swapping renderers
-//    @Override
-//    protected void onDetachedFromWindow() {
-//      super.onDetachedFromWindow();
-//      stop();
-//    }
-    } //  class
+    }
 
 
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-    public class SketchSurfaceViewGL extends CardboardView {  //GLSurfaceView {
+    public class SketchSurfaceViewGL extends GvrView {
         PGraphicsOpenGL g3;
 
         @SuppressWarnings("deprecation")
@@ -1214,11 +890,6 @@ public class PApplet extends CardboardActivity
             if (!supportsGLES2) {
                 throw new RuntimeException("OpenGL ES 2.0 is not supported by this device.");
             }
-
-//            surfaceHolder = getHolder();
-//            // are these two needed?
-//            surfaceHolder.addCallback(this);
-//            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
 
             // The PGraphics object needs to be created here so the renderer is not
             // null. This is required because PApplet.onResume events (which call
@@ -1273,58 +944,6 @@ public class PApplet extends CardboardActivity
             return g3;
         }
 
-
-//        // part of SurfaceHolder.Callback
-//        @Override
-//        public void surfaceCreated(SurfaceHolder holder) {
-//            super.surfaceCreated(holder);
-//            if (DEBUG) {
-//                System.out.println("surfaceCreated()");
-//            }
-//        }
-//
-//
-//        // part of SurfaceHolder.Callback
-//        @Override
-//        public void surfaceDestroyed(SurfaceHolder holder) {
-//            super.surfaceDestroyed(holder);
-//            if (DEBUG) {
-//                System.out.println("surfaceDestroyed()");
-//            }
-//
-//
-//      /*
-//      // TODO: Check how to make sure of calling g3.dispose() when this call to
-//      // surfaceDestoryed corresponds to the sketch being shut down instead of just
-//      // taken to the background.
-//
-//      // For instance, something like this would be ok?
-//      // The sketch is being stopped, so we dispose the resources.
-//      if (!paused) {
-//        g3.dispose();
-//      }
-//      */
-//        } // PApplet class
-//
-//
-//        @Override
-//        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-//            super.surfaceChanged(holder, format, w, h);
-//
-//            if (DEBUG) {
-//                System.out.println("SketchSurfaceView3D.surfaceChanged() " + w + " " + h);
-//            }
-//            surfaceChanged = true;
-////      width = w;
-////      height = h;
-////      g.setSize(w, h);
-//
-//            // No need to call g.setSize(width, height) b/c super.surfaceChanged()
-//            // will trigger onSurfaceChanged in the renderer, which calls setSize().
-//            // -- apparently not true? (100110)
-//        }
-//
-
         /**
          * Inform the view that the window focus has changed.
          */
@@ -1332,16 +951,7 @@ public class PApplet extends CardboardActivity
         public void onWindowFocusChanged(boolean hasFocus) {
             super.onWindowFocusChanged(hasFocus);
             surfaceWindowFocusChanged(hasFocus);
-//      super.onWindowFocusChanged(hasFocus);
-//      focused = hasFocus;
-//      if (focused) {
-////        println("got focus");
-//        focusGained();
-//      } else {
-////        println("lost focus");
-//        focusLost();
-//      }
-        }
+       }
 
 
         @Override
@@ -1364,13 +974,6 @@ public class PApplet extends CardboardActivity
             return super.onKeyUp(code, event);
         }
 
-
-        // don't think i want to call stop() from here, since it might be swapping renderers
-//    @Override
-//    protected void onDetachedFromWindow() {
-//      super.onDetachedFromWindow();
-//      stop();
-//    }
     }
 
 
@@ -1396,7 +999,6 @@ public class PApplet extends CardboardActivity
      * then motionX, motionY, motionPressed, and motionEvent will not be set.
      */
     public boolean surfaceTouchEvent(MotionEvent event) {
-//    println(event);
         nativeMotionEvent(event);
 //    return super.onTouchEvent(event);
         return true;
@@ -1460,33 +1062,7 @@ public class PApplet extends CardboardActivity
     }
 
 
-//  public int sketchOrientation() {
-//    return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-//    //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//  }
-
-
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-    /**
-     * Called by the browser or applet viewer to inform this applet that it
-     * should start its execution. It is called after the init method and
-     * each time the applet is revisited in a Web page.
-     * <p/>
-     * Called explicitly via the first call to PApplet.paint(), because
-     * PAppletGL needs to have a usable screen before getting things rolling.
-     */
-//    public void start() {
-//        finished = false;
-//        paused = false; // unpause the thread
-
-//        if (thread == null) {
-//            thread = new Thread(this, "Animation Thread");
-//            thread.start();
-//        }
-
-//    }
 
 
     /**
@@ -1524,22 +1100,6 @@ public class PApplet extends CardboardActivity
     public void destroy() {
         ((PApplet) this).exit();
     }
-
-
-    /**
-     * This returns the last width and height specified by the user
-     * via the size() command.
-     */
-//  public Dimension getPreferredSize() {
-//    return new Dimension(width, height);
-//  }
-
-
-//  public void addNotify() {
-//    super.addNotify();
-//    println("addNotify()");
-//  }
-
 
     //////////////////////////////////////////////////////////////
 
@@ -1616,8 +1176,6 @@ public class PApplet extends CardboardActivity
          * must be called multiple times if object is registered multiple times).
          * Does not shrink array afterwards, silently returns if method not found.
          */
-//    public void remove(Object object, Method method) {
-//      int index = findIndex(object, method);
         public void remove(Object object) {
             int index = findIndex(object);
             if (index != -1) {
@@ -1839,7 +1397,6 @@ public class PApplet extends CardboardActivity
     public void setup() {
     }
 
-
     public void draw() {
         // if no draw method, then shut things down
         //System.out.println("no draw method, goodbye");
@@ -1859,25 +1416,6 @@ public class PApplet extends CardboardActivity
     }
 
     //////////////////////////////////////////////////////////////
-
-
-//  protected void resizeRenderer(int iwidth, int iheight) {
-////    println("resizeRenderer request for " + iwidth + " " + iheight);
-//    if (width != iwidth || height != iheight) {
-////      int left = (screenWidth - iwidth) / 2;
-////      int right = screenWidth - (left + iwidth);
-////      int top = (screenHeight - iheight) / 2;
-////      int bottom = screenHeight - (top + iheight);
-////      surfaceView.setPadding(left, top, right, bottom);
-//
-//      g.setSize(iwidth, iheight);
-//      width = iwidth;
-//      height = iheight;
-//      overallLayout.invalidate();
-//      layout.invalidate();
-//    }
-//  }
-
 
     /**
      * Create a full-screen sketch using the default renderer.
@@ -1994,25 +1532,6 @@ public class PApplet extends CardboardActivity
 
 
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-    // not finished yet--will swap the renderer at a bad time
-  /*
-  public void renderer(String name) {
-    if (name.equals(A2D)) {
-      if (!(surfaceView instanceof SketchSurfaceView2D)) {
-        surfaceView = new SketchSurfaceView2D(this);
-        getWindow().setContentView(surfaceView);  // set full screen
-      }
-    } else if (name.equals(A3D)) {
-      if (!(surfaceView instanceof SketchSurfaceView3D)) {
-        surfaceView = new SketchSurfaceView3D(this);
-        getWindow().setContentView(surfaceView);  // set full screen
-      }
-    }
-  }
-  */
-
 
     /**
      * Creates a new PGraphics object and sets it to the specified size.
@@ -2240,13 +1759,6 @@ public class PApplet extends CardboardActivity
 
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-
-    // not necessary, ja?
-//  public void update(Graphics screen) {
-//    paint(screen);
-//  }
-
-
   /*
   //synchronized public void paint(Graphics screen) {  // shutting off for 0146
   public void paint(Graphics screen) {
@@ -2308,6 +1820,7 @@ public class PApplet extends CardboardActivity
 
     /**
      * Main method for the primary animation thread.
+     * NOT USED BY GOOGLE CARDBOARD VR
      */
     public void run() {  // not good to make this synchronized, locks things up
         long beforeTime = System.nanoTime();
@@ -2403,7 +1916,7 @@ public class PApplet extends CardboardActivity
 
     public void handleDraw(int eye) {
         if (DEBUG) {
-            Log.d(TAG, "inside handleDraw() " + millis() +
+            Log.d(TAG, "inside handleDraw(int) " + millis() +
                     " changed=" + surfaceChanged +
                     " ready=" + surfaceReady +
                     " paused=" + paused +
@@ -2412,15 +1925,6 @@ public class PApplet extends CardboardActivity
         }
         if (eye == Eye.Type.LEFT || eye == Eye.Type.MONOCULAR) {
             if (surfaceChanged) {
-                int newWidth = surfaceView.getWidth();
-                int newHeight = surfaceView.getHeight();
-                if (newWidth != width || newHeight != height) {
-                    width = newWidth;
-                    height = newHeight;
-                    displayWidth = newWidth;
-                    displayHeight = newHeight;
-                    g.setSize(width, height);
-                }
                 surfaceChanged = false;
                 surfaceReady = true;
                 if (DEBUG) {
@@ -2429,24 +1933,9 @@ public class PApplet extends CardboardActivity
             }
         }
 
-//    if (surfaceView.isShown()) {
-//      println("surface view not visible, getting out");
-//      return;
-//    } else {
-//      println("surface set to go.");
-//    }
-
         // don't start drawing (e.g. don't call setup) until there's a legitimate
         // width and height that have been set by surfaceChanged().
-//    boolean validSize = width != 0 && height != 0;
-//    println("valid size = " + validSize + " (" + width + "x" + height + ")");
         if (canDraw()) {
-//      if (!g.canDraw()) {
-//        // Don't draw if the renderer is not yet ready.
-//        // (e.g. OpenGL has to wait for a peer to be on screen)
-//        return;
-//      }
-
             //Log.d("PGLES", "framecount="+ frameCount);
             if (eye == Eye.Type.LEFT) {
                 leftDraw(false);
@@ -2460,7 +1949,7 @@ public class PApplet extends CardboardActivity
 
     public void handleDraw(Eye eye) {
         if (DEBUG) {
-            Log.d(TAG, "inside handleDraw() " + millis() +
+            Log.d(TAG, "inside handleDraw(eye) " + millis() +
                     " changed=" + surfaceChanged +
                     " ready=" + surfaceReady +
                     " paused=" + paused +
@@ -2469,15 +1958,6 @@ public class PApplet extends CardboardActivity
         }
         if (eye.getType() == Eye.Type.LEFT || eye.getType() == Eye.Type.MONOCULAR) {
             if (surfaceChanged) {
-                int newWidth = surfaceView.getWidth();
-                int newHeight = surfaceView.getHeight();
-                if (newWidth != width || newHeight != height) {
-                    width = newWidth;
-                    height = newHeight;
-                    displayWidth = newWidth;
-                    displayHeight = newHeight;
-                    g.setSize(width, height);
-                }
                 surfaceChanged = false;
                 surfaceReady = true;
                 if (DEBUG) {
@@ -2486,24 +1966,9 @@ public class PApplet extends CardboardActivity
             }
         }
 
-//    if (surfaceView.isShown()) {
-//      println("surface view not visible, getting out");
-//      return;
-//    } else {
-//      println("surface set to go.");
-//    }
-
         // don't start drawing (e.g. don't call setup) until there's a legitimate
         // width and height that have been set by surfaceChanged().
-//    boolean validSize = width != 0 && height != 0;
-//    println("valid size = " + validSize + " (" + width + "x" + height + ")");
         if (canDraw()) {
-//      if (!g.canDraw()) {
-//        // Don't draw if the renderer is not yet ready.
-//        // (e.g. OpenGL has to wait for a peer to be on screen)
-//        return;
-//      }
-
             //Log.d("PGLES", "framecount="+ frameCount);
             if (eye.getType() == Eye.Type.LEFT) {
                 leftDraw(eye);
@@ -2618,12 +2083,8 @@ public class PApplet extends CardboardActivity
                 // Give up, instead set the new renderer and re-attempt setup()
                 return;
             }
-            // onResume needed because cardboard rendering thread pauses depending on first frame
-            // even though mode is GLSurfaceView.RENDERMODE_CONTINUOUSLY
-            //getCardboardView().onResume();
 
             return;
-//        this.defaultSize = false;
 
         } else {  // frameCount > 0, meaning an actual draw()
             // update the current frameRate
@@ -2647,7 +2108,7 @@ public class PApplet extends CardboardActivity
                 draw();
             } else {
                 draw();
-                pStereo.leftEye(eye);
+                pStereo.leftEyeViewport(eye);
                 drawLeft();
                 pStereo.leftEye(eye);  // needed to force draw in left viewport
                 // see https://forum.processing.org/two/discussion/7204/opengl-multiple-views-and-coordinates
@@ -2704,24 +2165,12 @@ public class PApplet extends CardboardActivity
         return g != null && surfaceReady && !paused && (looping || redraw);
     }
 
-
     //////////////////////////////////////////////////////////////
 
 
     synchronized public void redraw() {
         if (!looping) {
             redraw = true;
-//      if (thread != null) {
-//        // wake from sleep (necessary otherwise it'll be
-//        // up to 10 seconds before update)
-//        if (CRUSTY_THREADS) {
-//          thread.interrupt();
-//        } else {
-//          synchronized (blocker) {
-//            blocker.notifyAll();
-//          }
-//        }
-//      }
         }
     }
 
@@ -3824,9 +3273,9 @@ public class PApplet extends CardboardActivity
 
         // call to shut down renderer, in case it needs it (pdf does)
         if (g != null) g.dispose();
-        surfaceView.destroyDrawingCache();
-        surfaceView.surfaceDestroyed(surfaceView.getHolder());
-        surfaceView = null;
+        //surfaceView.destroyDrawingCache();
+        //surfaceView.surfaceDestroyed(surfaceView.getHolder());
+        //surfaceView = null;
 //        window = null;
         handleMethods("dispose");
         if (thread == null) return;
@@ -4822,7 +4271,7 @@ public class PApplet extends CardboardActivity
 //  }
 
 
-    public PImage loadImage(String filename) { //, Object params) {
+    public PImage loadImage(String filename) {
 //    return loadImage(filename, null);
         InputStream stream = createInput(filename);
         if (stream == null) {
@@ -5133,7 +4582,7 @@ public class PApplet extends CardboardActivity
     return json.save(saveFile(filename), options);
   }
 
-  
+
   /**
    * @webref input:files
    * @param input String to parse as a JSONArray
@@ -9133,7 +8582,6 @@ public class PApplet extends CardboardActivity
                      float x2, float y2, float z2) {
         g.line(x1, y1, z1, x2, y2, z2);
     }
-
 
     public void triangle(float x1, float y1, float x2, float y2,
                          float x3, float y3) {

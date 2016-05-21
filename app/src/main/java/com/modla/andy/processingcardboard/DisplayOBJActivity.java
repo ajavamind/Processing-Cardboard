@@ -37,11 +37,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.vrtoolkit.cardboard.HeadTransform;
+import com.google.vr.sdk.base.HeadTransform;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
-import processing.core.PImage;
 import processing.core.PShape;
 
 
@@ -67,11 +66,10 @@ public class DisplayOBJActivity extends PApplet {
         //cardboardView.setSettingsButtonEnabled(false);
         //cardboardView.setDistortionCorrectionEnabled(false);
         cardboardView.setTransitionViewEnabled(true);
-        cardboardView.setDistortionCorrectionEnabled(true);
-        setCardboardView(cardboardView);
+        setGvrView(cardboardView);
         //cardboardView.setVRModeEnabled(false); // sets Monocular mode
         //Log.d(TAG, "getVRMode=" + cardboardView.getVRMode());
-        setConvertTapIntoTrigger(true);
+        //setConvertTapIntoTrigger(true);
         //Log.d(TAG, "getConvertTapIntoTrigger=" + getConvertTapIntoTrigger());
 
     }
@@ -112,7 +110,6 @@ public class DisplayOBJActivity extends PApplet {
         // If your OpenGL application is memory intensive,
         // you should consider de-allocating objects that
         // consume significant memory here.
-        cardboardView.onPause();
         Log.d(TAG, "onPause");
     }
 
@@ -146,6 +143,7 @@ public class DisplayOBJActivity extends PApplet {
     float roty = 0; //PI / 4;
     PShape rocket;
     PShape textImage;
+    PShape gridImage;
     float nearPlane = .1f;
     float farPlane = 1000f;
     float convPlane = 20.0f;
@@ -174,6 +172,7 @@ public class DisplayOBJActivity extends PApplet {
         rocket = loadShape("obj/rocket.obj");
         textSize(32);
         textImage = createTextGraphics("ROCKET");
+        gridImage = createGridShape();
         /* second constructor, custom eye separation, custom convergence */
         stereoView(
                 width, height, eyeSeparation, fieldOfViewY,
@@ -235,13 +234,15 @@ public class DisplayOBJActivity extends PApplet {
         popMatrix();
     }
 
+    // this technique is very slow
     public void drawGrid() {
         int gridSize = 1;
+        int delta = 5;
         pushMatrix();
         stroke(128);
         fill(64);
-        for(int i = -20; i <20; i+=gridSize) {
-            for(int j = -20; j < 20; j+=gridSize) {
+        for(int i = -delta; i <delta; i+=gridSize) {
+            for(int j = -delta; j < delta; j+=gridSize) {
                 int y = 1;
                 int z = 0;
                 line(i,          y, j,           i+gridSize, y, j          );
@@ -251,6 +252,47 @@ public class DisplayOBJActivity extends PApplet {
             }
         }
         popMatrix();
+    }
+
+    public void drawGridShape(PShape grid) {
+        pushMatrix();
+        scale(10f);
+        //rotateY(PI/4);
+        //rotateX(rotx);  // test
+        //rotateY(roty);
+        shape(grid);
+        popMatrix();
+    }
+
+    // experimental work in progress
+    public PShape createGridShape() {
+        int gridSize = 20;
+        stroke(128);
+        fill(64);
+        strokeWeight(1);
+        println("width=" + width + " height=" + height);
+        PGraphics buffer = createGraphics(width / 2, height, P2D);
+        buffer.beginDraw();
+        for (int y = 0; y < height; y += gridSize) {
+            buffer.line(0, y, width/2, y);
+        }
+        for (int x = 0; x < width; x += gridSize) {
+            buffer.line(x, 0, x, height);
+        }
+
+        buffer.endDraw();
+
+        PShape face = createShape();
+        face.beginShape(QUAD);
+        face.noStroke();
+        face.textureMode(NORMAL);
+        face.texture(buffer);
+        face.vertex(-1, -1, 0, 0, 0);
+        face.vertex(1, -1, 0, 1, 0);
+        face.vertex(1, 1, 0, 1, 1);
+        face.vertex(-1, 1, 0, 0, 1);
+        face.endShape();
+        return face;
     }
 
     public void mouseDragged() {
@@ -371,7 +413,8 @@ public class DisplayOBJActivity extends PApplet {
         drawShape(rocket);
         drawTextGraphics(textImage);
         drawText("Space", 30.0f);
-        drawGrid();
+        //drawGrid();
+        drawGridShape(gridImage);
     }
 
     /**
@@ -382,7 +425,8 @@ public class DisplayOBJActivity extends PApplet {
         drawShape(rocket);
         drawTextGraphics(textImage);
         drawText("Space", 30.0f);
-        drawGrid();
+        //drawGrid();
+        drawGridShape(gridImage);
     }
 
     /**

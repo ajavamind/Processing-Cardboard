@@ -22,9 +22,11 @@ android {
 dependencies {
   compile(name:'audio', ext:'aar')
   compile(name:'common', ext:'aar')
-  compile(name:'core', ext:'aar')
+  compile(name:'base', ext:'aar')
   compile 'com.android.support:appcompat-v7:23.0.1'
   compile 'com.android.support:support-v4:23.0.1'
+  compile files('libs/android-async-http-1.4.9.jar')
+  compile files('libs/httpclient-4.4.1.1.jar')
 }
 
 repositories{

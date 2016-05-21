@@ -42,10 +42,10 @@ import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
 import android.util.Log;
 
-import com.google.vrtoolkit.cardboard.CardboardView;
-import com.google.vrtoolkit.cardboard.Eye;
-import com.google.vrtoolkit.cardboard.HeadTransform;
-import com.google.vrtoolkit.cardboard.Viewport;
+import com.google.vr.sdk.base.GvrView;
+import com.google.vr.sdk.base.Eye;
+import com.google.vr.sdk.base.HeadTransform;
+import com.google.vr.sdk.base.Viewport;
 
 import processing.core.PApplet;
 import processing.opengl.tess.PGLU;
@@ -134,7 +134,7 @@ public class PGLES extends PGL {
 
   @Override
   public GLSurfaceView getNative() {
-    return glview;
+    return glview;  // null, hidden in Google cardboard sdk
   }
 
 
@@ -144,7 +144,7 @@ public class PGLES extends PGL {
 
   @Override
   protected void initSurface(int antialias) {
-    glview = (GLSurfaceView)sketch.getSurfaceView();
+    //glview = (GLSurfaceView)sketch.getSurfaceView();
     reqNumSamples = qualityToSamples(antialias);
     registerListeners();
   }
@@ -218,7 +218,8 @@ public class PGLES extends PGL {
   @Override
   protected void requestDraw() {
     if (graphics.initialized && sketch.canDraw()) {
-      glview.requestRender();
+      //glview.requestRender();
+      sketch.setSurfaceChanged(true);
     }
   }
 
@@ -324,7 +325,7 @@ public class PGLES extends PGL {
     }
   }
 
-  protected class AndroidCardboardRenderer implements CardboardView.Renderer {
+  protected class AndroidCardboardRenderer implements GvrView.Renderer {
     public AndroidCardboardRenderer() {
     }
 
@@ -388,7 +389,7 @@ public class PGLES extends PGL {
     }
   }
 
-  protected class AndroidCardboardStereoRenderer implements CardboardView.StereoRenderer {
+  protected class AndroidCardboardStereoRenderer implements GvrView.StereoRenderer {
     public AndroidCardboardStereoRenderer() {
     }
 
@@ -437,6 +438,7 @@ public class PGLES extends PGL {
     public void onSurfaceChanged(int width, int height) {
       if (DEBUG_CARDBOARD)
         Log.d(TAG, "CardboardView.StereoRenderer onSurfaceChanged width="+ width + " height="+ height);
+      sketch.setSurfaceChanged(true);
       graphics.setSize(width, height);
       GLES20.glViewport(0, 0, width, height);
     }

@@ -32,7 +32,7 @@ import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.Paint.Style;
 
-import com.google.vrtoolkit.cardboard.Eye;
+import com.google.vr.sdk.base.Eye;
 
 
 /**

@@ -86,8 +86,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Vibrator;
 
-import com.google.vrtoolkit.cardboard.CardboardView;
-import com.google.vrtoolkit.cardboard.HeadTransform;
+import com.google.vr.sdk.base.GvrView;
+import com.google.vr.sdk.base.HeadTransform;
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -104,6 +104,7 @@ public class MainActivity extends PApplet {
     PImage[] photoRight = null;
     PImage backgroundLeft = null;
     PImage backgroundRight = null;
+    boolean vrMode;
 
     static final float STARTX = 0f;
     static final float STARTY = 0f;
@@ -120,15 +121,13 @@ public class MainActivity extends PApplet {
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         //cardboardView.setAlignmentMarkerEnabled(false);
         //cardboardView.setSettingsButtonEnabled(false);
-        setCardboardView(cardboardView);
+        setGvrView(cardboardView);
         //cardboardView.setDistortionCorrectionEnabled(false);
-        //cardboardView.setDistortionCorrectionEnabled(true);
+        //cardboardView.setDistortionCorrectionEnabled(true);  // default
         cardboardView.setTransitionViewEnabled(true);
         //cardboardView.setVRModeEnabled(false); // sets Monocular mode
-        Log.d(TAG, "getVRMode=" + cardboardView.getVRMode());
-        setConvertTapIntoTrigger(true);
-        Log.d(TAG, "getConvertTapIntoTrigger=" + getConvertTapIntoTrigger());
-
+        vrMode = cardboardView.getVRMode();
+        Log.d(TAG, "getVRMode=" + vrMode);
     }
 
     @Override
@@ -220,14 +219,15 @@ public class MainActivity extends PApplet {
     float cameraPositionY = STARTY;
     float cameraPositionZ = STARTZ;
     float[] headView = new float[16];
+    int NUM_PHOTOS = 6;
+    int photoCounter = 0;
 
     @Override
     public void settings() {
         // set size to full screen dimensions
-        //size(displayWidth, displayHeight, P3D);  // equivalent to OPENGL
         // Processing variables displayWidth and displayHeight are your phone screen dimensions
         size(displayWidth, displayHeight, OPENGL);
-        println("settings()");
+        println("settings() done");
     }
 
     /**
@@ -236,16 +236,19 @@ public class MainActivity extends PApplet {
     @Override
     public void setup() {
         background(0);
+        // Note screen will be blank for a few seconds until
+        // photos loaded.
+        // TODO use requestImage()
         // load images for cube face textures
         if (photo == null) {
-            photo = new PImage[6];
+            photo = new PImage[NUM_PHOTOS];
             photo[0] = loadImage("data/IMG_0506_l.JPG");
             photo[1] = loadImage("data/IMG_0510_l.JPG");
             photo[2] = loadImage("data/IMG_0513_l.JPG");
             photo[3] = loadImage("data/IMG_0516_l.JPG");
             photo[4] = loadImage("data/IMG_0519_l.JPG");
             photo[5] = loadImage("data/IMG_0524_l.JPG");
-            photoRight = new PImage[6];
+            photoRight = new PImage[NUM_PHOTOS];
             photoRight[0] = loadImage("data/IMG_0506_r.JPG");
             photoRight[1] = loadImage("data/IMG_0510_r.JPG");
             photoRight[2] = loadImage("data/IMG_0513_r.JPG");
@@ -274,7 +277,7 @@ public class MainActivity extends PApplet {
         stereoView(width, height, eyeSeparation, fieldOfViewY, nearPlane, farPlane, convPlane);
 
         cardboardView.resetHeadTracker();
-
+        println("setup() done");
     }
 
     PShape createCube(PImage[] photo) {
@@ -602,6 +605,12 @@ public class MainActivity extends PApplet {
                 cameraPositionX, cameraPositionY, cameraPositionZ,
                 0f, 0f, -1f,  // directionX, directionY, directionZ
                 0f, 1f, 0f);  // upX, upY, upZ
+        if (!vrMode) {
+            // drawLeft() and drawRight() will not be called, so display the cube photos
+            image(photo[photoCounter++], 0,0);
+            if (photoCounter >= NUM_PHOTOS)
+                photoCounter = 0;
+        }
     }
 
     public void keyPressed() {

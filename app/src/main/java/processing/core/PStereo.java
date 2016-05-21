@@ -1,7 +1,7 @@
 package processing.core;
 
-import com.google.vrtoolkit.cardboard.Eye;
-import com.google.vrtoolkit.cardboard.Viewport;
+import com.google.vr.sdk.base.Eye;
+import com.google.vr.sdk.base.Viewport;
 
 import processing.opengl.PGL;
 
@@ -236,7 +236,7 @@ public class PStereo {
         );
     }
     /**
-     * Set the left eye viewport  (experimental)
+     * Set the left eye viewport only
      */
     public void leftEyeViewport(Eye eye) {
         // Adjusts viewport based on stereo type
