@@ -1,11 +1,11 @@
 # Processing-Cardboard
 
-This repository is an implementation of Processing-Android with Google Android Cardboard SDK.
-With this code you can write Processing sketches for Android apps to use stereo graphics/photo and Google Cardboard/VR features.
+This repository is an implementation of Processing-Android with Google VR SDK for Android (Cardboard).
+With this code you can write Processing sketches for Android apps to use stereo graphics/photo and Google VR/Cardboard features.
 
- The objective of this work is to provide an easier development platform by using Processing for learning to program VR Android apps intended for the Cardboard HMD viewer.
+ The objective of this work is to provide an easier development platform by using Processing to learn about and program VR Android apps intended for the Cardboard HMD (Head  Mounted Device) viewer.
  
- The  Processing-Android core library was modified to use the Cardboard SDK replacing the main draw thread with the Cardboard rendering thread. The Processing-Android core library has an abstraction layer for OPENGL that makes it possible to write an Android Cardboard app without using direct Android OPENGL calls. 
+ The  Processing-Android core library was modified to use the Google VR (Cardboard) SDK replacing the main draw thread with the Cardboard rendering thread. The Processing-Android core library has an abstraction layer for OPENGL that makes it possible to write an Android Cardboard app without using direct Android OPENGL calls. 
  
  Included are example Android apps for Google Cardboard to demonstrate coding with the Processing Language for Android library and the Google Cardboard Android SDK. 
  
@@ -20,7 +20,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
 ## Implementation
  
- * Works with Android Studio (2.1.1)
+ * Works with Android Studio (2.1.1) build tools 23.0.1
  * Google VR SDK for Android libraries version 0.8.0 (aar files included in the libs folder, replacing cardboard.jar and audio.jar)
  * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
    with Processing-Android core source code from: https://github.com/processing/processing-android.
