@@ -27,7 +27,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
  * Minimum builds supports Android API 4.4 (19) platform and above. AndroidManifest.xml is set for Kitkat 4.4 (19)
  * Tested with Sony Z1S phone, 1920 x 1080 pixel display, running Android version 5.0.2, with GPU hardware accelerator
- * Tested with Samsung Galaxy S6 phone, 2560 x 1440 pixel display, running Android version 5.1.1
+ * Tested with Samsung Galaxy S6 phone, 2560 x 1440 pixel display, running Android version 6.0.1
  
 ## Processing-Android Modifications
 
