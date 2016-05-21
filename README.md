@@ -10,7 +10,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  Included are example Android apps for Google Cardboard to demonstrate coding with the Processing Language for Android library and the Google Cardboard Android SDK. 
  
  Processing with Cardboard SDK is an alternative for writing Android VR applications. 
- It is another way to build/explore/learn the Cardboard VR app development platform.
+ It is another way to use/explore/learn the Cardboard VR app development platform.
  
  
 ![Transion Screenshot](Screenshot_2016-04-01-15-43-29.png)
@@ -88,6 +88,7 @@ Distortion correction enabled:
 ## Issues:
  
   1. Out of memory can result when using large images or restarting the app.
+  2. Line drawing to the screen directly is very slow. (Processing-Android OPENGL)
  
 ## Updates:
  
@@ -101,7 +102,8 @@ Distortion correction enabled:
   
 ### 2016/05/21
   
-  1. Modifications for Google VR SDK for Android (Cardboard) version 0.8.0
+  1. Modifications to use Google VR SDK for Android (Cardboard) version 0.8.0
+  2. Removed use of android.opengl.GLSurfaceView in PApplet because it is not accessible with Google VR SDK version 0.8.0
 
 ## Notes:
  The magnet pull trigger does not work well with my phone so I use new convert tap to trigger feature
