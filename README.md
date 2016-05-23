@@ -31,7 +31,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
 ## Processing-Android Modifications
 
- * Modified the Processing-Android core Library to work directly with the Gooble VR SDK for Android (Cardboard).
+ * Modified the Processing-Android core Library to work directly with the Google VR SDK for Android (Cardboard).
 
  * PApplet extends GvrActivity
  
@@ -120,7 +120,7 @@ Distortion correction enabled:
   3. When using distortion correction (default enabled), you need to adjust the eyeSeparation parameter to suit. The example apps assume distortion correction enabled. 
 
 ## Demo App in Google Play Store
-I wrote a simple demonstration arcade game/simulation for Google Cardboard VR based on the code Processing-Cardboard. Check it out at:
+I wrote a simple demonstration arcade game/simulation, Mosquito Swarm, for Google Cardboard VR based on the code Processing-Cardboard. Check it out at:
 
 https://play.google.com/store/apps/details?id=com.modla.andy.swarm3dfree
 
