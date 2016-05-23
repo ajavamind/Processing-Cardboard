@@ -7,7 +7,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
  The  Processing-Android core library was modified to use the Google VR (Cardboard) SDK replacing the main draw thread with the Cardboard rendering thread. The Processing-Android core library has an abstraction layer for OPENGL that makes it possible to write an Android Cardboard app without using direct Android OPENGL calls. 
  
- Included are example Android apps for Google Cardboard to demonstrate coding with the Processing Language for Android library and the Google Cardboard Android SDK. 
+ Included are example Android apps for Google VR Cardboard to demonstrate coding with the Processing Language for Android library and the Google Cardboard Android SDK. 
  
  Processing with Cardboard SDK is an alternative for writing Android VR applications. 
  It is another way to use/explore/learn the Cardboard VR app development platform.
@@ -104,17 +104,25 @@ Distortion correction enabled:
   
   1. Modifications to use Google VR SDK for Android (Cardboard) version 0.8.0
   2. Removed use of android.opengl.GLSurfaceView in PApplet because it is not accessible with Google VR SDK version 0.8.0
+  
+### 2016/05/23
+  
+  1. Increase Matrix stack depth.
 
 ## Notes:
- The magnet pull trigger does not work well with my phone so I use new convert tap to trigger feature
- available in Cardboard V2.
- 
- No library build was defined here to make a Processing Android SDK library for use with a desktop computer.
- 
- Must use minimum Android 4.4 (19) with version 0.8.0. This is also better for faster image/photo processing and display
+  1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.
+  2. No library build was defined here to make a Processing Android SDK library or mode for use with the Processing IDE.
+  3. With Google VR SDK, version 0.8.0, the use minimum build is Android 4.4 (19). This happens to be better for faster image/photo processing and display
+
+## Processing Coding Notes:
+  1. You must include a call to background() in the draw() method. 
+  If not the result will be that nothing appears on the screen in VR mode.
+  2. Google VR SDK expects each frame to be redrawn in VR mode, so you cannot assume graphics to remain on the screen or built up with each frame. 
+  However in monocular mode (VR mode disabled), the screen can be built up with graphics until a call is made to background().  
+  3. When using distortion correction (default enabled), you need to adjust the eyeSeparation parameter to suit. The example apps assume distortion correction enabled. 
 
 ## Usage Example
-I wrote a simple demonstration arcade game/simulation for Google Cardboard VR based on the code here. Check it out at:
+I wrote a simple demonstration arcade game/simulation for Google Cardboard VR based on the code Processing-Cardboard. Check it out at:
 
 https://play.google.com/store/apps/details?id=com.modla.andy.swarm3dfree
 

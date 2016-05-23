@@ -257,7 +257,7 @@ public class PGraphicsOpenGL extends PGraphics {
    */
   protected boolean sized;
 
-  static protected final int MATRIX_STACK_DEPTH = 32;
+  static protected final int MATRIX_STACK_DEPTH = 64;  //32;
 
   protected int modelviewStackDepth;
   protected int projectionStackDepth;
