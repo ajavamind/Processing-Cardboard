@@ -9,7 +9,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
  Included are example Android apps for Google VR Cardboard to demonstrate coding with the Processing Language for Android library and the Google Cardboard Android SDK. 
  
- Processing with Cardboard SDK is an alternative for writing Android VR applications. 
+ Processing with Cardboard VR SDK is an alternative for writing Android VR applications. 
  It is another way to use/explore/learn the Cardboard VR app development platform.
  
  
@@ -35,22 +35,20 @@ With this code you can write Processing sketches for Android apps to use stereo 
 
  * PApplet extends GvrActivity
  
- * The main display thread used by Cardboard SDK for its display rendering replaces the display thread 
+ * The main display thread used by Google Cardboard VR SDK for its display rendering replaces the display thread 
  in Processing-Android that calls draw().
 
- * Added draw functions for left and right eye in Processing
+ * Added head transform and draw functions for left and right eye in Processing: headtransform(), drawleft(), drawright()
 
  * SketchSurfaceView extends GvrView
 
  * SketchSurfaceViewGL extends GvrView
 
- * CardboardView rendering uses GvrView.StereoRenderer
+ * GvrView rendering uses GvrView.StereoRenderer
 
  * GvrView.Renderer code is also available but not used.
 
  * Added PStereo class for stereo view control
-  
- * Added headtransform(), drawleft(), drawright() functions to Processing
   
  * Added external keyboard codes for remote Bluetooth controller key press.
  
@@ -112,7 +110,7 @@ Distortion correction enabled:
 ## Notes:
   1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.
   2. No library build was defined here to make a Processing Android SDK library or mode for use with the Processing IDE.
-  3. With Google VR SDK, version 0.8.0, the use minimum build is Android 4.4 (19). This happens to be better for faster image/photo processing and display
+  3. With Google VR SDK, version 0.8.0, the minimum build is for Android 4.4 (19). This happens to be better for faster image/photo processing and display
 
 ## Processing Coding Notes:
   1. You must include a call to background() in the draw() method. 
@@ -121,7 +119,7 @@ Distortion correction enabled:
   However in monocular mode (VR mode disabled), the screen can be built up with graphics until a call is made to background().  
   3. When using distortion correction (default enabled), you need to adjust the eyeSeparation parameter to suit. The example apps assume distortion correction enabled. 
 
-## Usage Example
+## Demo App in Google Play Store
 I wrote a simple demonstration arcade game/simulation for Google Cardboard VR based on the code Processing-Cardboard. Check it out at:
 
 https://play.google.com/store/apps/details?id=com.modla.andy.swarm3dfree
