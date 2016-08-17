@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.modla.andy.processingcardboard"
-    android:versionCode="3"
-    android:versionName="3.0">
+    package="com.modla.andy.processingcardboard">
 
     <uses-sdk
         android:minSdkVersion="19"
@@ -73,6 +71,7 @@
                 <!--<category android:name="com.google.intent.category.CARDBOARD" />-->
             <!--</intent-filter>-->
         <!--</activity>-->
+
         <!--<activity-->
             <!--android:name=".PhotoActivity"-->
             <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
