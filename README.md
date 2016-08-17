@@ -21,7 +21,7 @@ With this code you can write Processing sketches for Android apps to use stereo 
 ## Implementation
  
  * Works with Android Studio (2.1.1) build tools 23.0.1
- * Google VR SDK for Android libraries version 0.8.0 (aar files included in the libs folder, replacing cardboard.jar and audio.jar)
+ * Google VR SDK for Android libraries version 0.9.1 (aar files included in the libs folder, replacing old cardboard.jar and audio.jar)
  * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
    with Processing-Android core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
