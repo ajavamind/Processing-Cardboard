@@ -361,14 +361,29 @@ public interface PConstants {
   static final int DOWN      = KeyEvent.KEYCODE_DPAD_DOWN;
   static final int LEFT      = KeyEvent.KEYCODE_DPAD_LEFT;
   static final int RIGHT     = KeyEvent.KEYCODE_DPAD_RIGHT;
- static final int MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
+  static final int DPAD_CENTER     = KeyEvent.KEYCODE_DPAD_CENTER;
+  static final int START     = KeyEvent.KEYCODE_BUTTON_START;
+
+  static final int BUTTON_A  = KeyEvent.KEYCODE_BUTTON_A;
+  static final int BUTTON_B = KeyEvent.KEYCODE_BUTTON_B;
+  static final int BUTTON_C = KeyEvent.KEYCODE_BUTTON_C;
+  static final int BUTTON_X = KeyEvent.KEYCODE_BUTTON_X;
+  static final int BUTTON_Y = KeyEvent.KEYCODE_BUTTON_Y;
+  static final int SPACE = KeyEvent.KEYCODE_SPACE;
+  static final int DEL = KeyEvent.KEYCODE_DEL;
+
+  static final int MEDIA_NEXT = KeyEvent.KEYCODE_MEDIA_NEXT;   // RIGHT
   static final int MEDIA_PREVIOUS = KeyEvent.KEYCODE_MEDIA_PREVIOUS;   // LEFT
   static final int MEDIA_FAST_FORWARD = KeyEvent.KEYCODE_MEDIA_FAST_FORWARD;    // UP
   static final int MEDIA_REWIND = KeyEvent.KEYCODE_MEDIA_REWIND;    // DOWN
+  static final int MEDIA_PLAY_PAUSE = KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE;
+
   static final int MEDIA_ENTER = KeyEvent.KEYCODE_ENTER;
+  static final int VOLUME_UP = KeyEvent.KEYCODE_VOLUME_UP;
+  static final int VOLUME_DOWN = KeyEvent.KEYCODE_VOLUME_DOWN;
 
 
-  // These seem essential for most sketches, so they're included.
+    // These seem essential for most sketches, so they're included.
   // Others can be found in the KeyEvent reference:
   // http://developer.android.com/reference/android/view/KeyEvent.html
   static final int BACK = KeyEvent.KEYCODE_BACK;

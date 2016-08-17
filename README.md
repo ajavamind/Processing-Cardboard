@@ -107,17 +107,22 @@ Distortion correction enabled:
   
   1. Increase Matrix stack depth.
 
+### 2016/08/17
+  
+  1. Modifications to use Google VR SDK for Android (Cardboard) version 0.9.1. This is now labeled "Stereo Mode" by Google to distinguish from Android release N VR Mode.
+  2. Add constants for more keys used by bluetooth remote controllers
+
 ## Notes:
   1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.
-  2. No library build was defined here to make a Processing Android SDK library or mode for use with the Processing IDE.
-  3. With Google VR SDK, version 0.8.0, the minimum build is for Android 4.4 (19). This happens to be better for faster image/photo processing and display
+  2. No library build is defined here to make a Processing Android SDK library or mode for use with the Processing IDE.
+  3. Starting with Google VR SDK, version 0.8.0, the minimum build is for Android 4.4 (19). This happens to be better for faster image/photo processing and display
 
 ## Processing Coding Notes:
   1. You must include a call to background() in the draw() method. 
   If not the result will be that nothing appears on the screen in VR mode.
   2. Google VR SDK expects each frame to be redrawn in VR mode, so you cannot assume graphics to remain on the screen or built up with each frame. 
   However in monocular mode (VR mode disabled), the screen can be built up with graphics until a call is made to background().  
-  3. When using distortion correction (default enabled), you need to adjust the eyeSeparation parameter to suit. The example apps assume distortion correction enabled. 
+  3. When using distortion correction (default enabled), you may need to adjust the eyeSeparation parameter to suit. The example apps assume distortion correction enabled. 
 
 ## Demo App in Google Play Store
 I wrote a simple demonstration arcade game/simulation, Mosquito Swarm, for Google Cardboard VR based on the code Processing-Cardboard. Check it out at:

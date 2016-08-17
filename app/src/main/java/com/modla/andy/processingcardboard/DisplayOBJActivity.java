@@ -67,11 +67,6 @@ public class DisplayOBJActivity extends PApplet {
         //cardboardView.setDistortionCorrectionEnabled(false);
         cardboardView.setTransitionViewEnabled(true);
         setGvrView(cardboardView);
-        //cardboardView.setVRModeEnabled(false); // sets Monocular mode
-        //Log.d(TAG, "getVRMode=" + cardboardView.getVRMode());
-        //setConvertTapIntoTrigger(true);
-        //Log.d(TAG, "getConvertTapIntoTrigger=" + getConvertTapIntoTrigger());
-
     }
 
     @Override

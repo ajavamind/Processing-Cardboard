@@ -125,9 +125,9 @@ public class MainActivity extends PApplet {
         //cardboardView.setDistortionCorrectionEnabled(false);
         //cardboardView.setDistortionCorrectionEnabled(true);  // default
         cardboardView.setTransitionViewEnabled(true);
-        //cardboardView.setVRModeEnabled(false); // sets Monocular mode
-        vrMode = cardboardView.getVRMode();
-        Log.d(TAG, "getVRMode=" + vrMode);
+        //cardboardView.setStereoModeEnabled(false); // sets Monocular mode
+        vrMode = cardboardView.getStereoModeEnabled();
+        Log.d(TAG, "getStereoModeEnabled=" + vrMode);
     }
 
     @Override
