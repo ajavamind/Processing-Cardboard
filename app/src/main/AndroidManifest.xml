@@ -63,7 +63,7 @@
             <!--android:name=".PaintActivity"-->
             <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
             <!--android:icon="@mipmap/ic_launcher"-->
-            <!--android:label="LightPaintVR"-->
+            <!--android:label="PaintVR"-->
             <!--android:screenOrientation="landscape">-->
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
