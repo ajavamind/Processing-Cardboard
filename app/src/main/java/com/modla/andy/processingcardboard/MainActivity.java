@@ -276,7 +276,8 @@ public class MainActivity extends PApplet {
         // set up stereo view
         stereoView(width, height, eyeSeparation, fieldOfViewY, nearPlane, farPlane, convPlane);
 
-        cardboardView.resetHeadTracker();
+        //cardboardView.resetHeadTracker();
+        cardboardView.recenterHeadTracker();
         println("setup() done");
     }
 
@@ -473,7 +474,8 @@ public class MainActivity extends PApplet {
         cameraPositionX = STARTX;
         cameraPositionY = STARTY;
         cameraPositionZ = STARTZ;
-        cardboardView.resetHeadTracker();
+        //cardboardView.resetHeadTracker();
+        cardboardView.recenterHeadTracker();
     }
 
     @Override

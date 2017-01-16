@@ -20,8 +20,8 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
 ## Implementation
  
- * Works with Android Studio (2.2) build tools 23.0.2
- * Google VR SDK for Android libraries version 0.9.1 (aar files included in the libs folder, replacing old cardboard.jar and audio.jar)
+ * Works with Android Studio (2.2.3) build tools 24.0.0
+ * Google VR SDK for Android libraries version 1.10.0 (aar files included in the libs folder, replacing old cardboard.jar and audio.jar)
  * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
    with Processing-Android core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
@@ -116,6 +116,11 @@ Distortion correction enabled:
   
   1. Modifications to use Google VR SDK for Android (Cardboard) version 1.0.0.
   2. Use Android Studio 2.2
+  
+### 2017/01/16
+  
+  1. Modifications to use Google VR SDK for Android (Cardboard) version 1.10.0.
+  2. Use Android Studio 2.2.3
   
 ## Notes:
   1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.

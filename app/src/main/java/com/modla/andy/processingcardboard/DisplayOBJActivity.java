@@ -175,7 +175,8 @@ public class DisplayOBJActivity extends PApplet {
                 farPlane,
                 convPlane);
 
-        cardboardView.resetHeadTracker();
+        //cardboardView.resetHeadTracker();
+        cardboardView.recenterHeadTracker();
 
     }
 
@@ -300,7 +301,8 @@ public class DisplayOBJActivity extends PApplet {
         cameraPositionX = STARTX;
         cameraPositionY = STARTY;
         cameraPositionZ = STARTZ;
-        cardboardView.resetHeadTracker();
+        //cardboardView.resetHeadTracker();
+        cardboardView.recenterHeadTracker();
     }
 
     @Override
