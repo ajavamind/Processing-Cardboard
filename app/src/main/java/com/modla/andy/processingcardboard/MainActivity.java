@@ -176,6 +176,7 @@ public class MainActivity extends PApplet {
         // If you de-allocated graphic objects for onPause()
         // this is a good place to re-allocate them.
         Log.d(TAG, "onResume");
+        resetTracker();
     }
 
     @Override
@@ -478,100 +479,42 @@ public class MainActivity extends PApplet {
         cardboardView.recenterHeadTracker();
     }
 
+    volatile float heading;  // degrees
+    volatile float attitude; // degrees
+    volatile float bank; // degrees
+    private float[] euler = new float[3];
+    private float[] quat = new float[4];
+
     @Override
     public void headTransform(HeadTransform headTransform) {
-        float[] quat = new float[4];
         headTransform.getQuaternion(quat, 0);
-        // normalize quaternion
-        float length = (float) Math.sqrt(quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3]);
-        int DIV = 10;
-        float lowSpeed = .01f;  //.005f;
-        float mediumSpeed = .02f;  //.01f;
-        float highSpeed = .04f;  //.02f;
-        float pitchSpeed = 0;
-        float yawSpeed = 0;
-        float rollSpeed = 0;
-        if (length != 0) {
-            int pitch = (int) ((quat[0] / length) * DIV);  // pitch up/down
-            int yaw = (int) ((quat[1] / length) * DIV);  // yaw left/ right
-            int roll = (int) ((quat[2] / length) * DIV);  // roll left/right
-            //int w = (int) ((quat[3] / length) * DIV);  //
-            //Log.d(TAG, "normalized quaternion " + pitch + " " + yaw + " " + roll );
+        headTransform.getEulerAngles(euler, 0);
+        bank = degrees(euler[0]);
+        heading = degrees(euler[1]);
+        attitude = degrees(euler[2]);
+        float zoomSpeedMax = .01f;  //.01f;
+        float TILT_FOR_ZOOM = 7.5f; // degrees
 
-            if (pitch >= 3)
-                pitchSpeed = -highSpeed;
-            else if (pitch <= -3)
-                pitchSpeed = highSpeed;
-            else if (pitch == 2)
-                pitchSpeed = -mediumSpeed;
-            else if (pitch == -2)
-                pitchSpeed = mediumSpeed;
-            else if (pitch == 1)
-                pitchSpeed = -lowSpeed;
-            else if (pitch == -1)
-                pitchSpeed = lowSpeed;
-            else
-                pitchSpeed = 0;
-
-            if (yaw >= 3)
-                yawSpeed = -highSpeed;
-            else if (yaw <= -3)
-                yawSpeed = highSpeed;
-            else if (yaw == 2)
-                yawSpeed = -mediumSpeed;
-            else if (yaw == -2)
-                yawSpeed = mediumSpeed;
-            else if (yaw == 1)
-                yawSpeed = -lowSpeed;
-            else if (yaw == -1)
-                yawSpeed = lowSpeed;
-            else
-                yawSpeed = 0;
-
-            if (roll >= 3)
-                rollSpeed = -highSpeed;
-            else if (roll <= -3)
-                rollSpeed = highSpeed;
-            else if (roll == 2)
-                rollSpeed = -mediumSpeed;
-            else if (roll == -2)
-                rollSpeed = mediumSpeed;
-            else if (roll == 1)
-                rollSpeed = -lowSpeed;
-            else if (roll == -1)
-                rollSpeed = lowSpeed;
-            else
-                rollSpeed = 0;
-
-            if ((cameraPositionX > XBOUND && yawSpeed < 0) ||
-                    (cameraPositionX < -XBOUND && yawSpeed > 0) ||
-                    (cameraPositionX <= XBOUND && cameraPositionX >= -XBOUND))
-                cameraPositionX += yawSpeed;
-
-
-            if ((cameraPositionY > YBOUND && pitchSpeed < 0) ||
-                    (cameraPositionY < -YBOUND && pitchSpeed > 0) ||
-                    (cameraPositionY <= YBOUND && cameraPositionY >= -YBOUND))
-                cameraPositionY += pitchSpeed;
-
-            if ((cameraPositionZ > ZBOUND_IN && rollSpeed < 0) ||
-                    (cameraPositionZ < ZBOUND_OUT && rollSpeed > 0) ||
-                    (cameraPositionZ <= ZBOUND_OUT && cameraPositionZ >= ZBOUND_IN))
-                cameraPositionZ -= rollSpeed;
-
-//            Log.d(TAG, "Normalized quaternion " + pitch + " " + yaw + " " + roll + " Camera position "+ cameraPositionX + " " + cameraPositionY + " " + cameraPositionZ);
-        } else {
-            Log.d(TAG, "Quaternion 0");
+        float inc = -.020f;
+        // X
+        if (heading >= -90 && heading <= 90) {  // 180 degrees swivel
+            cameraPositionX = PI * 2 * heading * inc;
         }
 
-//        headTransform.getHeadView(headView, 0);
-//
-//        if (!Float.isNaN(headView[0])) {
-//            Log.d(TAG, "headView"  + " "+ headView[0] + " " + headView[1] + " " + headView[2] + " " + headView[3] + " " );
-//            Log.d(TAG, "        "  +  " "+ headView[4] + " " + headView[5] + " " + headView[6] + " " + headView[7] + " " );
-//            Log.d(TAG, "        "  +  " "+ headView[8] + " " + headView[9] + " " + headView[10] + " " + headView[11] + " " );
-//            Log.d(TAG, "        "  +  " "+ headView[12] + " " + headView[13] + " " + headView[14] + " " + headView[15] + " " );
-//        }
+        // Y
+        inc = .04f;
+        if (bank >= -90 && bank <= 90) {  // 180 degrees swivel
+            cameraPositionY = -2 * bank * inc;
+        }
+
+        // Z
+        inc = 0.0f;
+        if (attitude > TILT_FOR_ZOOM) {
+            inc = zoomSpeedMax;
+        } else if (attitude < -TILT_FOR_ZOOM) {
+            inc = -zoomSpeedMax;
+        }
+        cameraPositionZ += inc;
 
     }
 

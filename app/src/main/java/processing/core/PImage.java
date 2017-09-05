@@ -268,6 +268,9 @@ public class PImage implements PConstants, Cloneable {
     }
     if (bitmap != null) {
       bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+      bitmap.recycle();
+      bitmap = null;
+      System.gc();
     }
     setLoaded();
   }

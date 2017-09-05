@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion '25.0.2'
+    compileSdkVersion 25
 
     defaultConfig {
         applicationId "com.modla.andy.processingcardboard"
         minSdkVersion 19
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -20,17 +20,21 @@ android {
 }
 
 dependencies {
-    compile 'com.google.vr:sdk-audio:1.10.0'
-    compile 'com.google.vr:sdk-base:1.10.0'
-    compile 'com.google.vr:sdk-common:1.10.0'
-  compile 'com.android.support:appcompat-v7:24.0.0'
-  compile 'com.android.support:support-v4:24.0.0'
-  compile files('libs/android-async-http-1.4.9.jar')
-  compile files('libs/httpclient-4.4.1.1.jar')
+    compile 'com.google.vr:sdk-audio:1.80.0'
+    compile 'com.google.vr:sdk-base:1.80.0'
+    compile 'com.google.vr:sdk-common:1.80.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile files('libs/android-async-http-1.4.9.jar')
+    compile files('libs/httpclient-4.4.1.1.jar')
 }
 
-repositories{
-  flatDir{
-    dirs 'libs'
-  }
+allprojects {
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+        // For GVR components, the official source of the .aars is JCenter.
+        jcenter()
+    }
 }

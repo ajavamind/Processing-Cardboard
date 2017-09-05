@@ -3,7 +3,7 @@
 This repository is an implementation of Processing-Android with Google VR SDK for Android (Cardboard).
 With this code you can write Processing sketches for Android apps to use stereo graphics/photo and Google VR/Cardboard features.
 
- The objective of this work is to provide an easier development platform by using Processing to learn about and program VR Android apps intended for the Cardboard HMD (Head  Mounted Device) viewer.
+ The objective of this work is to provide an easier development platform by using Processing to learn about and program Google VR Android apps intended for the Cardboard HMD (Head  Mounted Device) viewer.
  
  The  Processing-Android core library was modified to use the Google VR (Cardboard) SDK replacing the main draw thread with the Cardboard rendering thread. The Processing-Android core library has an abstraction layer for OPENGL that makes it possible to write an Android Cardboard app without using direct Android OPENGL calls. 
  
@@ -20,14 +20,14 @@ With this code you can write Processing sketches for Android apps to use stereo 
  
 ## Implementation
  
- * Works with Android Studio (2.2.3) build tools 24.0.0
- * Google VR SDK for Android libraries version 1.10.0 (aar files included in the libs folder, replacing old cardboard.jar and audio.jar)
+ * Works with Android Studio (2.3.3) build tools 25.0.2
+ * Google VR SDK for Android libraries version 1.80.0 (aar files from jcenter )
  * Based on Processing for Android library version 3.0.0, 3.0.1, 3.0.2 RC1 Android Mode 247 (as of 2016/03/07)
    with Processing-Android core source code from: https://github.com/processing/processing-android.
  * Based on Stereo library source code from: https://github.com/CreativeCodingLab/stereo
  * Minimum builds supports Android API 4.4 (19) platform and above. AndroidManifest.xml is set for Kitkat 4.4 (19)
  * Tested with Sony Z1S phone, 1920 x 1080 pixel display, running Android version 5.0.2, with GPU hardware accelerator
- * Tested with Samsung Galaxy S6 phone, 2560 x 1440 pixel display, running Android version 6.0.1
+ * Tested with Samsung Galaxy S7 phone, 2560 x 1440 pixel display, running Android version 7.0
  
 ## Processing-Android Modifications
 
@@ -85,7 +85,7 @@ Distortion correction enabled:
 
 ## Issues:
  
-  1. Out of memory can result when using large images or restarting the app.
+  1. Out of memory can result when using large images or restarting the app. Images need to be recycled by the app.
   2. Line drawing to the screen directly is very slow. (Processing-Android OPENGL)
  
 ## Updates:
@@ -121,6 +121,12 @@ Distortion correction enabled:
   
   1. Modifications to use Google VR SDK for Android (Cardboard) version 1.10.0.
   2. Use Android Studio 2.2.3
+  
+### 2017/09/05
+  
+  1. Modifications to use Google VR SDK for Android (Cardboard) version 1.80.0.
+  2. Use Android Studio 2.3.3
+  3. Change the headTransform positioning logic.
   
 ## Notes:
   1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.
