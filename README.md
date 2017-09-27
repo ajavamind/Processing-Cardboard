@@ -128,6 +128,7 @@ Distortion correction enabled:
   2. Use Android Studio 2.3.3
   3. Change the headTransform positioning logic.
   
+  
 ## Notes:
   1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.
   2. No library build is defined here to make a Processing Android SDK library or mode for use with the Processing IDE.
