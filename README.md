@@ -85,7 +85,7 @@ Distortion correction enabled:
 
 ## Issues:
  
-  1. Out of memory can result when using large images or restarting the app. Images need to be recycled by the app.
+  1. Out of memory can result when using large images or restarting the app. Images need to be recycled by the app when finished.
   2. Line drawing to the screen directly is very slow. (Processing-Android OPENGL)
  
 ## Updates:
@@ -128,6 +128,9 @@ Distortion correction enabled:
   2. Use Android Studio 2.3.3
   3. Change the headTransform positioning logic.
   
+### 2017/09/28
+  
+  1. Update to Android SDK 26.
   
 ## Notes:
   1. The magnet pull trigger is no longer supported. Please use Cardboard V2 headset.
